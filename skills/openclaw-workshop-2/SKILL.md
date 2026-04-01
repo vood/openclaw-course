@@ -206,11 +206,16 @@ Or get specific:
 
 **What this teaches:** The full pipeline -- file handling, local AI processing, text extraction, and macOS integration. This is a workflow people actually pay for.
 
-**Audio source:** There's a sample meeting recording included in the repo at `samples/meeting-recording.m4a` -- a ~55 second team standup with action items for several people.
+**Audio source (best to worst):**
+1. **Find a real recording in Google Drive** -- use gog to search their Drive for a meeting recording. This is the best option because it exercises the Drive integration AND gives them a real meeting to summarize.
+2. **Pull from Zoom** -- if they use Zoom, recordings are often saved locally or in the cloud. Help them find one.
+3. **Share a file in chat** -- they can drop any audio file directly into the Telegram conversation and the agent picks it up.
+4. **Use the sample file** -- there's a sample standup recording in this project at `samples/meeting-recording.m4a` (~55 seconds, team standup with action items). Use this as a fallback if they don't have their own.
 
-They can also use their own recording (QuickTime, Voice Memos, or send one via Telegram).
+**Prompt to try (with Drive):**
+> Search my Google Drive for any meeting recordings or audio files. Pick one, transcribe it using Whisper, create a clean summary with key decisions and action items, and save it to Apple Notes.
 
-**Prompt to try:**
+**Prompt to try (with sample file):**
 > I have a meeting recording at samples/meeting-recording.m4a. Please transcribe it using Whisper, create a clean summary with key decisions and action items, and save it to Apple Notes.
 
 **What to watch for:**
