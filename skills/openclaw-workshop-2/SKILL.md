@@ -340,18 +340,18 @@ osascript -e 'tell application "Notes" to make new note at folder "Notes" with p
 
 ### Use Case 6: Morning News Briefing ☀️
 
-> Set up a cron job that delivers a personalized news briefing to your Telegram every morning.
+> Set up a cron job that delivers a personalized news briefing to your Telegram AND email every morning.
 
-**What we're doing:** Creating a scheduled job that runs every morning, browses news sources relevant to YOUR interests, and sends you a concise summary before you start your day.
+**What we're doing:** Creating a scheduled job that runs every morning, browses news sources relevant to YOUR interests, sends a quick summary to Telegram, and emails a nicely formatted briefing to the student's personal email via gog.
 
-**What this teaches:** Cron jobs (autonomous scheduling) + browser (web research) + personalization. This is the "employee that works while you sleep" moment.
+**What this teaches:** Cron jobs (autonomous scheduling) + browser (web research) + email (gog) + personalization. This is the "employee that works while you sleep" moment. It also exercises email sending -- something we set up but haven't used in a use case yet.
 
 **Step 1: Figure out their interests.**
-Ask the student: What topics do you care about? Tech? Finance? Local news? Industry-specific stuff?
+Ask the student: What topics do you care about? Tech? Finance? Local news? Industry-specific stuff? And what's your personal email where you want the briefing delivered?
 
 **Step 2: Set up the cron job.**
 *Prompt to try:*
-> Set up a daily cron job that runs at 7:30am. Every morning, browse [Hacker News / TechCrunch / Bloomberg / their preferred sources] and send me a Telegram summary of the top 5 stories relevant to [their interests]. Keep it concise -- headlines and one-sentence summaries. Add links so I can read more if interested.
+> Set up a daily cron job that runs at 7:30am. Every morning, browse [Hacker News / TechCrunch / Bloomberg / their preferred sources] and: (1) send me a quick Telegram summary of the top 5 stories relevant to [their interests] with headlines and one-sentence summaries, and (2) send a nicely formatted email with the full briefing to [student's personal email] -- include links, a brief intro, and a sign-off. Subject line: "Your Morning Briefing - [date]".
 
 **Step 3: Verify it's scheduled.**
 Check that the cron job exists and is set for the right time.
@@ -359,12 +359,14 @@ Check that the cron job exists and is set for the right time.
 **What to watch for:**
 - Is the cron job actually created?
 - Is the timing correct (right timezone!)?
-- Does a test run produce a good summary?
+- Does a test run produce a good summary on Telegram?
+- Does the briefing email arrive at the student's inbox?
+- Is the email well-formatted and useful?
 - Are the stories actually relevant to their interests?
 
-**Pro tip to share:** Run the cron job manually first to test: make the agent do a briefing right now. Once it looks good, the schedule takes over.
+**Pro tip to share:** Run the cron job manually first to test: make the agent do a briefing right now. Check both Telegram and email. Once it looks good, the schedule takes over.
 
-**The moment:** Tomorrow morning, they'll wake up to a personalized news briefing waiting in their Telegram. No one asked for it. The agent just did it. That's the difference between a tool and an employee.
+**The moment:** Tomorrow morning, they'll wake up to a personalized news briefing waiting in both their Telegram and their inbox. No one asked for it. The agent just did it. That's the difference between a tool and an employee.
 
 ---
 
