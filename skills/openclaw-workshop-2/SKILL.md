@@ -299,13 +299,13 @@ Or get specific:
 
 ---
 
-### Use Case 5: Meeting Summary → Apple Notes 📝
+### Use Case 5: Meeting Summary → Apple Notes + Google Sheet 📝
 
-> Record or find a meeting recording, transcribe it locally, extract action items, and put them in Apple Notes.
+> Record or find a meeting recording, transcribe it locally, extract action items, put the summary in Apple Notes, and create a to-do tracker in Google Sheets.
 
-**What we're doing:** The agent processes an audio recording with Whisper (locally -- no data leaves the machine), extracts a summary and action items, and inserts them into Apple Notes via AppleScript.
+**What we're doing:** The agent processes an audio recording with Whisper (locally -- no data leaves the machine), extracts a summary and action items, saves the summary to Apple Notes, and creates a structured to-do list in a Google Sheet via gog with owners, deadlines, and status columns.
 
-**What this teaches:** The full pipeline -- file handling, local AI processing, text extraction, and macOS integration. This is a workflow people actually pay for.
+**What this teaches:** The full pipeline -- file handling, local AI processing, text extraction, macOS integration, AND cloud collaboration via Google Sheets. This is a workflow people actually pay for.
 
 **Audio source (best to worst):**
 1. **Find a real recording in Google Drive** -- use gog to search their Drive for a meeting recording. This is the best option because it exercises the Drive integration AND gives them a real meeting to summarize.
@@ -314,23 +314,27 @@ Or get specific:
 4. **Use the sample file** -- there's a sample standup recording in this project at `samples/meeting-recording.m4a` (~55 seconds, team standup with action items). Use this as a fallback if they don't have their own.
 
 **Prompt to try (with Drive):**
-> Search my Google Drive for any meeting recordings or audio files. Pick one, transcribe it using Whisper, create a clean summary with key decisions and action items, and save it to Apple Notes.
+> Search my Google Drive for any meeting recordings or audio files. Pick one, transcribe it using Whisper, then: (1) save a clean summary with key decisions to Apple Notes, and (2) create a Google Sheet called "Meeting Action Items" with columns for Task, Owner, Deadline, and Status -- populate it with every action item from the meeting.
 
 **Prompt to try (with sample file):**
-> I have a meeting recording at samples/meeting-recording.m4a. Please transcribe it using Whisper, create a clean summary with key decisions and action items, and save it to Apple Notes.
+> I have a meeting recording at samples/meeting-recording.m4a. Please transcribe it using Whisper, then: (1) save a clean summary to Apple Notes, and (2) create a Google Sheet called "Meeting Action Items" with columns for Task, Owner, Deadline, and Status -- populate it with every action item from the meeting.
 
 **What to watch for:**
 - Does Whisper transcribe the audio correctly?
 - Is the summary clean and useful (not just a raw transcript)?
-- Are action items clearly identified?
 - Does it actually appear in Apple Notes?
+- Is the Google Sheet created with the right columns?
+- Are action items structured properly -- task, owner, deadline, status?
+- Can the student open the Sheet and see their to-dos?
 
-**The Apple Notes part:** The agent uses AppleScript to create a new note. Example:
+**The Apple Notes part:** The agent uses AppleScript to create a new note:
 ```
 osascript -e 'tell application "Notes" to make new note at folder "Notes" with properties {name:"Meeting Summary - [date]", body:"[content]"}'
 ```
 
-**Celebrate:** You just went from raw audio to organized action items in Apple Notes, all locally, all automatic. This is a workflow that saves hours every week.
+**The Google Sheet part:** The agent uses gog to create a new spreadsheet and populate it. The sheet becomes a living to-do tracker the student can share with their team, check off items, and have the agent update later.
+
+**Celebrate:** You just went from raw audio to organized notes in Apple Notes AND a structured to-do tracker in Google Sheets -- all locally transcribed, all automatic. This is the kind of workflow that turns a 30-minute post-meeting chore into a one-sentence prompt.
 
 ---
 
@@ -429,7 +433,7 @@ Use Cases:
 🗂️ Scanned your filesystem and cleaned up safe-to-delete files
 📅 Researched an event and booked it into your calendar
 🐦 Posted a tweet (or skipped -- that's cool too)
-📝 Transcribed a meeting and put action items in Apple Notes
+📝 Transcribed a meeting → Apple Notes + Google Sheet to-do tracker
 ☀️ Set up a morning news briefing that runs every day
 💡 Built your own custom automation
 
