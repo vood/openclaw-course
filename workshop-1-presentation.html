@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Workshop 1: Getting Started</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e8e8ed;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.45);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%; height: 100%;
+            display: none;
+            padding: 70px 100px;
+            position: absolute; top: 0; left: 0;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute; top: 30px; left: 100px; right: 100px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 3.8rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 16px; }
+        h2 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; margin-bottom: 24px; }
+        h3 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 20px 0 12px 0; letter-spacing: -0.01em; }
+
+        .slide-content { margin-top: 100px; flex: 1; }
+
+        p, li { font-size: 1.35rem; line-height: 1.8; color: var(--text-dim); font-weight: 400; }
+        ul { list-style: none; margin: 16px 0; }
+        li { margin: 12px 0; padding-left: 28px; position: relative; }
+        li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .highlight { color: #fff; font-weight: 600; }
+        .bad { color: var(--red); font-weight: 600; }
+        .warn { color: var(--orange); font-weight: 500; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+
+        .column {
+            background: var(--surface); padding: 32px;
+            border-radius: var(--radius); border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .column h3 { margin-top: 0; }
+
+        .quote {
+            font-size: 1.3rem; color: var(--text-dim);
+            border-left: 3px solid var(--accent); padding-left: 24px; margin: 32px 0;
+            font-weight: 400;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.03); padding: 28px; border-radius: var(--radius);
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 1rem;
+            color: var(--text); margin: 20px 0; white-space: pre; overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 1.2rem; }
+        th, td { padding: 20px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            transition: width 0.3s ease; z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed; bottom: 24px; right: 40px;
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.1) 0%, var(--bg) 70%);
+        }
+        .title-slide .subtitle { font-size: 1.6rem; }
+        .title-slide h1 { font-size: 5rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; }
+        .title-slide h1 .grad { background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: var(--text-muted); margin-top: 8px; font-weight: 400; }
+
+        .section-number {
+            font-size: 10rem; font-weight: 900;
+            color: #fff; opacity: 0.03; position: absolute; top: 10px; right: 80px;
+            letter-spacing: -0.05em;
+        }
+
+        .prompt-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius); padding: 20px 24px;
+            margin: 16px 0; font-size: 1.05rem; line-height: 1.6; max-width: 750px;
+            color: var(--text);
+        }
+        .prompt-block::before {
+            content: "Prompt";
+            display: block; font-size: 0.7rem; color: var(--accent);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+        }
+
+        .flow-diagram { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 30px 0; flex-wrap: wrap; }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; text-align: center; min-width: 160px; flex: 1; max-width: 220px;
+            backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .flow-step .step-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .flow-step .step-text { font-size: 0.95rem; color: var(--text-dim); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-muted); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+        .stat-label { font-size: 1rem; color: var(--text-muted); margin-top: 8px; }
+
+        .step-sequence { display: flex; gap: 16px; margin: 24px 0; }
+        .step-box {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; text-align: center;
+        }
+        .step-box.active-step {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-color: transparent;
+        }
+        .step-box .step-num { font-size: 2.2rem; font-weight: 800; opacity: 0.15; margin-bottom: 8px; color: #fff; }
+        .step-box.active-step .step-num { opacity: 0.3; }
+        .step-box .step-label { font-size: 1rem; color: var(--text-dim); }
+        .step-box.active-step .step-label { color: #fff; }
+
+        .column-accent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.03));
+            border-color: rgba(99,102,241,0.2);
+        }
+        .column-accent h3 { color: #fff; }
+        .column-accent li { color: var(--text); }
+
+        .rr-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 20px auto; max-width: 300px; }
+        .rr-box {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px 24px; text-align: center; width: 100%;
+        }
+        .rr-box strong { color: #fff; font-size: 1rem; }
+        .rr-box span { display: block; font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+        .rr-arrow { font-size: 1.3rem; color: var(--text-muted); padding: 4px 0; }
+        .rr-end {
+            margin-top: 8px; padding: 10px 20px;
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.15);
+            border-radius: 100px; font-size: 0.85rem; color: var(--red); font-weight: 600;
+        }
+
+        .loop-section { display: flex; gap: clamp(30px, 4vw, 80px); align-items: flex-start; justify-content: center; margin-top: 10px; }
+        .loop-left { flex: 0 0 clamp(280px, 25vw, 500px); text-align: center; }
+        .loop-right { flex: 1; max-width: clamp(400px, 35vw, 700px); }
+        .loop-ring { position: relative; width: clamp(280px, 22vw, 500px); height: clamp(280px, 22vw, 500px); margin: 0 auto; }
+        .loop-ring .ring-node {
+            position: absolute; width: 110px; text-align: center;
+            transform: translate(-50%, -50%);
+        }
+        .ring-node-inner {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05));
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 12px; padding: 10px 8px; font-size: 0.9rem;
+            color: var(--text-dim); line-height: 1.4;
+        }
+        .ring-node-inner strong { color: var(--accent); display: block; margin-bottom: 2px; font-size: 0.9rem; }
+        .loop-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; width: 120px;
+        }
+        .loop-center-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .loop-center-val { font-size: 1rem; color: var(--accent); font-weight: 700; margin-top: 2px; }
+        .tools-row {
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+            margin-top: 12px;
+        }
+        .tool-chip {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+        }
+        .tool-chip-dim { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+        .tool-chip-accent { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); color: var(--accent); }
+        .goal-input {
+            margin-bottom: 20px; padding: 14px 20px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); text-align: left;
+        }
+        .goal-input-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 4px; }
+        .goal-input-text { font-size: 1rem; color: var(--text); }
+
+        .tag {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-red { background: rgba(239,68,68,0.12); color: var(--red); }
+        .tag-accent { background: var(--accent-glow); color: var(--accent); }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        /* ========== HIGH-RES / LARGE DISPLAY SCALING ========== */
+
+        /* Scale root font for large viewports so everything grows proportionally */
+        @media (min-width: 1600px) {
+            html { font-size: 18px; }
+        }
+        @media (min-width: 1920px) {
+            html { font-size: 20px; }
+            .slide { padding: 80px 140px; }
+            .slide-title { left: 140px; right: 140px; }
+            .flow-step { min-width: 160px; padding: 24px 28px; }
+            .flow-step .step-icon { font-size: 2.2rem; }
+            .stat-card { padding: 40px; }
+            .stat-number { font-size: 3.2rem; }
+            .column { padding: 40px; }
+            .two-columns { gap: 40px; }
+            .step-sequence { gap: 24px; }
+            .step-box { padding: 32px; }
+            .prompt-block { padding: 28px 32px; max-width: 900px; font-size: 1.15rem; }
+            table { font-size: 1.3rem; }
+            th, td { padding: 24px 32px; }
+        }
+        @media (min-width: 2400px) {
+            html { font-size: 24px; }
+            .slide { padding: 100px 200px; }
+            .slide-title { left: 200px; right: 200px; }
+            h1 { font-size: 4.5rem; }
+            .title-slide h1 { font-size: 6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 1.6rem; }
+            .flow-diagram { gap: 20px; }
+            .flow-step { min-width: 180px; padding: 28px 32px; }
+            .flow-step .step-icon { font-size: 2.6rem; }
+            .flow-arrow { font-size: 2rem; }
+            .stat-grid { gap: 36px; }
+            .stat-card { padding: 48px; }
+            .stat-number { font-size: 3.6rem; }
+            .stat-label { font-size: 1.15rem; }
+            .column { padding: 48px; }
+            .two-columns { gap: 50px; }
+            .step-sequence { gap: 30px; }
+            .step-box { padding: 40px; }
+            .prompt-block { padding: 32px 40px; max-width: 1100px; font-size: 1.25rem; }
+            .quote { font-size: 1.5rem; padding-left: 32px; }
+            .code-block { padding: 36px; font-size: 1.1rem; }
+            table { font-size: 1.4rem; }
+            th, td { padding: 28px 36px; }
+            li { margin: 16px 0; }
+            .progress-bar { height: 3px; }
+        }
+        @media (min-width: 3200px) {
+            html { font-size: 30px; }
+            .slide { padding: 120px 260px; }
+            .slide-title { left: 260px; right: 260px; }
+            .title-slide h1 { font-size: 7rem; }
+            .stat-grid { gap: 48px; }
+            .stat-card { padding: 56px; }
+            .column { padding: 56px; }
+            .progress-bar { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active">
+            <h1>🦀 <span class="grad">OpenClaw Sprint C1</span></h1>
+            <div class="subtitle">Workshop 1: Getting Started</div>
+            <p style="margin-top: 48px; color: var(--text-muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <!-- Slide 2: Welcome -->
+        <div class="slide">
+            <div class="slide-title"><h2>👋 Welcome</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    Our <span class="highlight">very first cohort</span>
+                </p>
+                <ul>
+                    <li>❓ Ask anything, anytime</li>
+                    <li>🏃 Your pace, not ours</li>
+                    <li>🎯 Goal: OpenClaw <span class="highlight">installed and running</span> today</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: First question -->
+        <div class="slide">
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
+                <p style="font-size: 3rem; font-weight: 800; color: #fff; margin-bottom: 40px; letter-spacing: -0.03em;">
+                    🤔 What do you want to <span style="color: var(--accent);">automate</span>?
+                </p>
+                <p style="font-size: 1.5rem; color: var(--text-muted); max-width: 600px;">
+                    One thing you do <span class="highlight">repeatedly</span> that you wish someone else handled.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Today's Plan -->
+        <div class="slide">
+            <div class="slide-title"><h2>📋 Today's Plan</h2></div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🧠 Understanding OpenClaw</h3>
+                        <ul>
+                            <li>What is an <span class="highlight">AI agent</span>?</li>
+                            <li>What is OpenClaw</li>
+                            <li><span class="highlight">Risks</span> and how to manage them</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>🛠️ Setup</h3>
+                        <ul>
+                            <li>Install OpenClaw</li>
+                            <li>Connect <span class="highlight">Telegram</span></li>
+                            <li>Enable <span class="highlight">voice-to-text</span></li>
+                            <li>Enable <span class="highlight">email</span> via IMAP</li>
+                            <li>Try the <span class="highlight">browser</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: WHAT IS AN AI AGENT ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🤖 <span class="grad">What Is an AI Agent?</span></h1>
+        </div>
+
+        <!-- ChatGPT: Not a loop -->
+        <div class="slide">
+            <div class="slide-title"><h2>💬 ChatGPT: Request &rarr; Response</h2></div>
+            <div class="slide-content" style="display: flex; align-items: center; justify-content: center; gap: 80px; height: 75%;">
+                <div class="rr-diagram">
+                    <div class="rr-box"><strong>You type a prompt</strong><span>"Write me an email to..."</span></div>
+                    <div class="rr-arrow">&darr;</div>
+                    <div class="rr-box"><strong>AI generates text</strong><span>One response</span></div>
+                    <div class="rr-arrow">&darr;</div>
+                    <div class="rr-box"><strong>You copy-paste it</strong><span>You do the actual work</span></div>
+                    <div class="rr-end">Done. Not a loop.</div>
+                </div>
+                <div style="max-width: 360px;">
+                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 24px;">Not a loop. A <span class="highlight">one-shot</span>.</p>
+                    <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 12px;">Tools:</p>
+                    <div class="tools-row" style="justify-content: flex-start;">
+                        <span class="tool-chip tool-chip-dim">web search</span>
+                        <span class="tool-chip tool-chip-dim" style="opacity: 0.5;">...that's about it</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agentic Loop -->
+        <div class="slide">
+            <div class="slide-title"><h2>🔄 The Agentic Loop</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="loop-section">
+                    <div class="loop-left">
+                        <div class="goal-input">
+                            <div class="goal-input-label">Goal (kicks off the loop)</div>
+                            <div class="goal-input-text">"Handle my SEO partnership emails"</div>
+                        </div>
+                        <div class="loop-ring">
+                            <svg viewBox="0 0 340 340" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                                <circle cx="170" cy="170" r="125" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="40"/>
+                                <circle cx="170" cy="170" r="125" fill="none" stroke="rgba(99,102,241,0.35)" stroke-width="2" stroke-dasharray="8 12">
+                                    <animateTransform attributeName="transform" type="rotate" from="0 170 170" to="360 170 170" dur="15s" repeatCount="indefinite"/>
+                                </circle>
+                                <defs>
+                                    <marker id="arrowA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(99,102,241,0.8)"/>
+                                    </marker>
+                                </defs>
+                                <path d="M 200 48 A 125 125 0 0 1 290 140" fill="none" stroke="rgba(99,102,241,0.55)" stroke-width="2" marker-end="url(#arrowA)"/>
+                                <path d="M 290 200 A 125 125 0 0 1 200 292" fill="none" stroke="rgba(99,102,241,0.55)" stroke-width="2" marker-end="url(#arrowA)"/>
+                                <path d="M 140 292 A 125 125 0 0 1 50 200" fill="none" stroke="rgba(99,102,241,0.55)" stroke-width="2" marker-end="url(#arrowA)"/>
+                                <path d="M 50 140 A 125 125 0 0 1 140 48" fill="none" stroke="rgba(99,102,241,0.55)" stroke-width="2" marker-end="url(#arrowA)"/>
+                            </svg>
+                            <div class="ring-node" style="top: 10%; left: 50%;"><div class="ring-node-inner"><strong>Plan</strong>Break goal into steps</div></div>
+                            <div class="ring-node" style="top: 50%; left: 93%;"><div class="ring-node-inner"><strong>Execute</strong>Use tools, take action</div></div>
+                            <div class="ring-node" style="top: 90%; left: 50%;"><div class="ring-node-inner"><strong>Evaluate</strong>Did it work?</div></div>
+                            <div class="ring-node" style="top: 50%; left: 7%;"><div class="ring-node-inner"><strong>Reflect</strong>Adjust strategy</div></div>
+                            <div class="loop-center">
+                                <div class="loop-center-label">Loops until</div>
+                                <div class="loop-center-val">goal is met</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="loop-right" style="padding-top: 20px;">
+                        <p style="font-size: 1.4rem; font-weight: 600; color: var(--text); margin-bottom: 24px;">Keeps going until the <span class="highlight">goal is met</span></p>
+                        <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 16px;">Tools available to the agent:</p>
+                        <div class="tools-row" style="justify-content: flex-start;">
+                            <span class="tool-chip tool-chip-accent">file system</span>
+                            <span class="tool-chip tool-chip-accent">terminal</span>
+                            <span class="tool-chip tool-chip-accent">browser</span>
+                            <span class="tool-chip tool-chip-accent">email</span>
+                            <span class="tool-chip tool-chip-accent">APIs</span>
+                            <span class="tool-chip tool-chip-accent">OS</span>
+                            <span class="tool-chip tool-chip-accent">cron</span>
+                            <span class="tool-chip tool-chip-accent">memory</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What Is OpenClaw -->
+        <div class="slide">
+            <div class="slide-title"><h2>🦀 What Is OpenClaw?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 70%;">
+                <p style="font-size: 1.8rem; margin-bottom: 32px; color: var(--text);">
+                    Free, <span class="highlight">open-source AI agent</span> &mdash; 20+ messaging apps
+                </p>
+                <div class="stat-grid" style="width: 100%; max-width: 800px;">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">⭐</div>
+                        <div class="stat-number">330k+</div>
+                        <div class="stat-label">GitHub stars<br><small style="color:var(--text-muted)">#1 most-starred project</small></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">🍴</div>
+                        <div class="stat-number">64k+</div>
+                        <div class="stat-label">GitHub forks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">🧩</div>
+                        <div class="stat-number">2,857+</div>
+                        <div class="stat-label">plugins on ClawHub<br><small style="color:var(--text-muted)">⚠️ ~20% malicious</small></div>
+                    </div>
+                </div>
+                <img src="https://api.star-history.com/svg?repos=openclaw/openclaw&type=Date" alt="OpenClaw GitHub stars chart" style="margin-top: 28px; max-width: clamp(400px, 40vw, 800px); width: 100%; border-radius: var(--radius); border: 1px solid var(--border); opacity: 0.92;">
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>✨ What Can It Do?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>📧 Auto-reply to <span class="highlight">SEO emails</span> after checking site quality</li>
+                    <li>💸 Win back <span class="highlight">cancelled subscribers</span> via personalized emails</li>
+                    <li>🤝 Send <span class="highlight">personalized LinkedIn</span> connection requests</li>
+                    <li>📰 Daily <span class="highlight">Hacker News summary</span> to your inbox</li>
+                    <li>🛒 Handle <span class="highlight">grocery shopping</span> lists and orders</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ChatGPT vs OpenClaw -->
+        <div class="slide">
+            <div class="slide-title"><h2>⚔️ ChatGPT vs OpenClaw</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns" style="margin-top: 0;">
+                    <div class="column">
+                        <h3>ChatGPT / Claude / Codex</h3>
+                        <ul>
+                            <li>🔧 A <span class="highlight">tool</span> &mdash; you ask, it answers</li>
+                            <li>⏳ Waits for <span class="highlight">permission</span></li>
+                            <li>🧠 No <span class="highlight">memory</span> between sessions</li>
+                            <li>🖥️ Lives in a <span class="highlight">chat window</span></li>
+                            <li>🔒 Locked to <span class="highlight">one provider</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>OpenClaw</h3>
+                        <ul>
+                            <li>👤 An <span class="highlight">employee</span>, not a tool</li>
+                            <li>⚡ <span class="highlight">YOLO mode</span> &mdash; acts without asking</li>
+                            <li>🎭 <span class="highlight">Personality</span>, opinions, evolves</li>
+                            <li>🧠 Deep <span class="highlight">memory</span>, self-develops</li>
+                            <li>💓 Always on &mdash; <span class="highlight">24/7</span> heartbeat</li>
+                            <li>💬 Telegram, iMessage, WhatsApp</li>
+                            <li>🔀 <span class="highlight">Any AI provider</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔀 Tools Are Converging</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 40px; color: var(--text-dim);">
+                    The <span class="highlight">capabilities gap</span> is shrinking
+                </p>
+                <p style="font-size: 2.8rem; font-weight: 700; color: #fff; margin-bottom: 40px;">
+                    But none of them want to be a <span style="color: var(--accent);">person</span>.
+                </p>
+                <p style="font-size: 1.3rem; color: var(--text-muted);">
+                    Personality. Memory. Heartbeat. Opinions.
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: ARCHITECTURE ==================== -->
+
+        <div class="slide title-slide">
+            <h1>⚙️ <span class="grad">How OpenClaw Works</span></h1>
+            <div class="subtitle">Core components</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🗺️ The Big Picture</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 32px; color: var(--text-dim);">A <span class="highlight">switchboard</span> between your apps and the AI</p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">💬</div><div class="step-text">Telegram<br>WhatsApp<br>Slack<br>Discord</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05)); border-color: rgba(99,102,241,0.3);"><div class="step-icon">⚡</div><div class="step-text"><strong style="color:#fff;">Gateway</strong><br><span style="color:var(--text-muted)">port 18789</span></div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text"><strong>AI Agent</strong><br><span style="color:var(--text-muted)">Claude / GPT</span></div></div>
+                    <div class="flow-arrow">&harr;</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="flow-step" style="flex: none; max-width: none;"><div class="step-icon">📱</div><div class="step-text"><strong>Node</strong> <span style="color:var(--text-muted)">iPhone</span></div></div>
+                        <div class="flow-step" style="flex: none; max-width: none;"><div class="step-icon">💻</div><div class="step-text"><strong>Node</strong> <span style="color:var(--text-muted)">MacBook</span></div></div>
+                        <div class="flow-step" style="flex: none; max-width: none;"><div class="step-icon">📷</div><div class="step-text"><strong>Node</strong> <span style="color:var(--text-muted)">Camera</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>📡 Gateway &mdash; The Switchboard</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>🔗 Connects <span class="highlight">all messaging apps</span></li>
+                    <li>↩️ Routes messages to AI and back</li>
+                    <li>👥 Controls <span class="highlight">who can talk</span> to agent</li>
+                    <li>🚨 If misconfigured &mdash; <span class="bad">open to the internet</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>👁️ Nodes &mdash; Eyes and Hands</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; margin-bottom: 24px; color: var(--text-dim);">Apps on your phone, tablet, or Mac</p>
+                <ul>
+                    <li>📷 <span class="highlight">Camera</span></li>
+                    <li>🎤 <span class="highlight">Microphone</span></li>
+                    <li>🖥️ <span class="highlight">Screen</span> recording</li>
+                    <li>🎨 <span class="highlight">Canvas</span> display</li>
+                </ul>
+                <p style="margin-top: 24px; color: var(--text-muted); font-size: 1rem;">Each device must be <span class="highlight">approved</span> first</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🧠 The Workspace &mdash; The Agent's Brain</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.3rem; margin-bottom: 24px; color: var(--text-dim);">A folder of text files &mdash; the agent can <span class="highlight">edit them itself</span></p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Who it is</h3>
+                        <ul>
+                            <li><span class="highlight">Personality</span> &mdash; tone, style</li>
+                            <li><span class="highlight">Identity</span> &mdash; name, vibe</li>
+                            <li><span class="highlight">About you</span> &mdash; who it serves</li>
+                            <li><span class="highlight">Rules</span> &mdash; permissions</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>How it operates</h3>
+                        <ul>
+                            <li><span class="highlight">Memory</span> &mdash; day to day</li>
+                            <li><span class="highlight">Tools</span> &mdash; what it can access</li>
+                            <li><span class="highlight">Heartbeat</span> &mdash; auto-checks</li>
+                            <li><span class="highlight">Startup</span> &mdash; boot routine</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Heartbeat -->
+        <div class="slide">
+            <div class="slide-title"><h2>💓 The Heartbeat</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; margin-bottom: 32px; color: var(--text-dim);">A <span class="highlight">cron job for your agent</span> &mdash; runs on a schedule, no prompt needed</p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>What it does</h3>
+                        <ul>
+                            <li>⏰ Runs every <span class="highlight">N minutes</span> automatically</li>
+                            <li>📋 Executes tasks you define in <span class="highlight">HEARTBEAT.md</span></li>
+                            <li>🔄 Agent acts <span class="highlight">without being asked</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Example tasks</h3>
+                        <ul>
+                            <li>📧 Check email for <span class="highlight">new leads</span></li>
+                            <li>📊 Send daily <span class="highlight">revenue report</span></li>
+                            <li>🔔 Monitor website <span class="highlight">uptime</span></li>
+                            <li>🧹 Clean up <span class="highlight">old files</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="font-size: 1.1rem; margin-top: 24px; color: var(--text-muted);">Without heartbeat &rarr; agent only responds when <em>you</em> message it.<br>With heartbeat &rarr; agent works <span class="highlight">proactively</span>, like a real employee.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: RISKS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>⚠️ <span class="grad">The Risks</span></h1>
+            <div class="subtitle">What can go wrong &amp; how we handle it</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🛡️ The Ground Rules</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 75%;">
+                <p style="font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    Treat it like a <span style="color: var(--accent);">new employee</span>.
+                </p>
+                <ul>
+                    <li>📂 Its <span class="highlight">own workspace</span>, email, calendar</li>
+                    <li>🚫 Keep away from <span class="highlight">sensitive accounts</span></li>
+                    <li>🔍 Vet plugins before installing</li>
+                    <li>🎯 Be <span class="highlight">specific</span> &mdash; vague = dangerous</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💥 Internal Risks (The Real Danger)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; color: var(--text); margin-bottom: 28px;">We've seen all of these <span class="highlight">first-hand</span>:</p>
+                <ul>
+                    <li>📨 <span class="bad">Emailed 1,000 customers</span> without preview</li>
+                    <li>🗑️ <span class="bad">Permanently deleted files</span> while "fixing" a bug</li>
+                    <li>💳 <span class="bad">Refunded Stripe charges</span> without confirmation</li>
+                </ul>
+                <p style="margin-top: 32px; font-size: 1.4rem; font-weight: 700; color: var(--red);">Powerful agent + vague instructions = damage</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🌐 External Risks</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>🧩 <span class="bad">~20% of plugins are malicious</span></li>
+                    <li>🌍 <span class="bad">390k+ instances</span> exposed on the internet</li>
+                    <li>📡 Misconfiguration = <span class="bad">open to your network</span></li>
+                    <li>🐛 Known bug allows <span class="bad">remote hijacking</span></li>
+                </ul>
+                <p style="margin-top: 32px; color: var(--text-muted); font-size: 1.1rem;">We'll set up <span class="highlight">safe defaults</span> that limit the blast radius.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>📈 How We Mitigate: Level Up Like an Employee</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 75%;">
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label">Start safe</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;"><span class="highlight">No sensitive data</span></p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label">Build trust</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;"><span class="highlight">Small tasks</span>, review work</p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label">Expand access</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">More tools, <span class="highlight">more responsibility</span></p>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label">Full autonomy</div>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 6px;"><span class="highlight">Independent</span>, you check in</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: WHERE TO RUN ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🏠 <span class="grad">Where to Run OpenClaw</span></h1>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🗂️ Your Options</h2></div>
+            <div class="slide-content">
+                <table>
+                    <tr>
+                        <th>Option</th>
+                        <th>Isolation</th>
+                        <th>Difficulty</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Dedicated OS user</span></td>
+                        <td>Good</td>
+                        <td>Easy</td>
+                        <td><span class="tag tag-green">Recommended</span></td>
+                    </tr>
+                    <tr>
+                        <td>Dedicated physical machine</td>
+                        <td>Best</td>
+                        <td>Easy (if you have one)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Virtual server (VPS)</td>
+                        <td>Best</td>
+                        <td>Hard</td>
+                        <td><span class="tag tag-accent">Advanced</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-muted); text-decoration: line-through;">Your own user account</td>
+                        <td style="color: var(--text-muted);">None</td>
+                        <td style="color: var(--text-muted);">Easiest</td>
+                        <td><span class="tag tag-red">Not recommended</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>✅ Option 1: Dedicated OS User</h2></div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>What you get</h3>
+                        <ul>
+                            <li>👁️ Can see files, <span class="highlight">can't delete</span></li>
+                            <li>🔐 No access to <span class="highlight">passwords</span></li>
+                            <li>🧹 Easy cleanup &mdash; <span class="highlight">delete the user</span></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Downsides</h3>
+                        <ul>
+                            <li>⏰ Only runs when <span class="highlight">laptop is open</span></li>
+                            <li>🔓 Not full isolation &mdash; <span class="highlight">good enough</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; font-size: 1.2rem; color: var(--text-muted);">
+                    Video walkthrough (Mac): <a href="https://www.loom.com/share/256e9d59ba6d49168bbcfa06dc0a239c">Create a new user on Mac</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: SETUP ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🚀 <span class="grad">Let's Set It Up</span></h1>
+            <div class="subtitle">Live walkthrough</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>📦 What You Need</h2></div>
+            <div class="slide-content">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">🛠️</div>
+                        <div class="stat-label" style="font-size: 1.15rem; color: var(--text);">A coding agent</div>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">Codex (ChatGPT) or Claude desktop app</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">📁</div>
+                        <div class="stat-label" style="font-size: 1.15rem; color: var(--text);">A project folder</div>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">Empty folder, e.g. ~/openclaw</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2.5rem;">📧</div>
+                        <div class="stat-label" style="font-size: 1.15rem; color: var(--text);">A dedicated Gmail</div>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">Not your personal email</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">01</div>
+            <div class="slide-title"><h2>🛠️ Step 1: Install a Coding Agent</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.3rem; color: var(--text-muted); margin-bottom: 20px;">Paid plan required (basic is fine)</p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>ChatGPT camp</h3>
+                        <ul>
+                            <li>Install <a href="https://openai.com/index/introducing-codex/">Codex</a></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Claude camp</h3>
+                        <ul>
+                            <li>Install <a href="https://claude.ai/download">Claude desktop app</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; color: var(--text-muted); font-size: 1.1rem;">Your <span class="highlight">tech support</span> for the whole course</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">02</div>
+            <div class="slide-title"><h2>📁 Step 2: Create a Project Folder</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="code-block">~/openclaw</div>
+                <p style="margin-top: 20px;">Open this folder in your coding agent:</p>
+                <ul>
+                    <li><span class="highlight">Codex</span> &mdash; select as project directory</li>
+                    <li><span class="highlight">Claude</span> &mdash; Code tab, select folder</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">03</div>
+            <div class="slide-title"><h2>⬇️ Step 3: Install OpenClaw</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-muted); margin-bottom: 20px;">Paste into your coding agent:</p>
+                <div class="prompt-block" style="max-width: 100%;">Help me install OpenClaw on my computer. As a non-technical person, please guide me through the process and explain security implications. In the non interactive mode. Don't ask me to do any actions in terminal. Do it yourself. I'm not technical.</div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE SETUP</span></h1>
+            <div class="subtitle">Let's install OpenClaw together</div>
+        </div>
+
+        <!-- ==================== SECTION: CONNECTING FEATURES ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔌 <span class="grad">Connecting Features</span></h1>
+            <div class="subtitle">Watch the agent modify itself</div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">04</div>
+            <div class="slide-title"><h2>💬 Step 4: Connect Telegram</h2></div>
+            <div class="slide-content">
+                <div class="prompt-block" style="max-width: 100%; margin-bottom: 28px;">Please connect OpenClaw to Telegram so I can message it from my phone. Walk me through creating a Telegram bot and configuring it.</div>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">🤖</div><div class="step-text">Create bot<br><small style="color:var(--text-muted)">@BotFather</small></div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🔑</div><div class="step-text">Get token</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">⚙️</div><div class="step-text">Agent configures</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">💬</div><div class="step-text">Chat from phone</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Connecting Telegram</div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">05</div>
+            <div class="slide-title"><h2>🎙️ Step 5: Add Voice-to-Text</h2></div>
+            <div class="slide-content">
+                <div class="prompt-block" style="max-width: 100%; margin-bottom: 24px;">I want to send you voice messages on Telegram. Please add voice-to-text support.</div>
+                <p style="font-size: 1.2rem; color: var(--text-dim); margin-bottom: 16px;">Watch the agent <span class="highlight">modify itself</span>:</p>
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label">Figures out what's needed</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label">Installs Whisper</div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label">Writes integration code</div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label">Updates config &amp; restarts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Voice-to-Text</div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">06</div>
+            <div class="slide-title"><h2>📧 Step 6: Enable Email via IMAP</h2></div>
+            <div class="slide-content">
+                <div class="prompt-block" style="max-width: 100%; margin-bottom: 24px;">Please connect my dedicated Gmail to OpenClaw via IMAP. Walk me through enabling IMAP access and configuring it.</div>
+                <ul>
+                    <li>⚙️ Enable <span class="highlight">IMAP</span> in Gmail settings</li>
+                    <li>🔑 Create an <span class="highlight">app password</span></li>
+                    <li>📬 Agent configures <span class="highlight">read and send</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Email via IMAP</div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">07</div>
+            <div class="slide-title"><h2>🌐 Step 7: Try the Browser</h2></div>
+            <div class="slide-content">
+                <div class="prompt-block" style="max-width: 100%; margin-bottom: 24px;">Please open google.com and search for "OpenClaw GitHub". Tell me what you find.</div>
+                <ul>
+                    <li>🖥️ Launches a <span class="highlight">headless browser</span></li>
+                    <li>📄 <span class="highlight">Navigates</span>, reads, reports back</li>
+                    <li>🔍 Can <span class="highlight">check websites</span>, fill forms, research</li>
+                </ul>
+                <p style="margin-top: 24px; color: var(--orange); font-size: 1.1rem;">⚠️ Most powerful capability &mdash; and <span class="highlight">riskiest</span></p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Browser</div>
+        </div>
+
+        <!-- ==================== SECTION: CODING AGENT ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🆘 Your Coding Agent = Your Tech Support</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="prompt-block">I have a bug &mdash; [describe it]. Help me fix it.</div>
+                <div class="prompt-block">I want to add a new feature &mdash; [describe what you want].</div>
+                <div class="prompt-block">What does this error mean? [paste error]</div>
+                <p style="margin-top: 24px; font-size: 1.3rem; font-weight: 600; color: var(--text);">Try the agent <span class="highlight">before</span> asking us.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: COSTS ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>💰 How Much Does It Cost?</h2></div>
+            <div class="slide-content">
+                <ul>
+                    <li>🎉 OpenClaw is <span class="highlight">free</span> (open-source)</li>
+                    <li>🧠 AI brain needs an <span class="highlight">API key</span> (pay per use)</li>
+                    <li>🚫 <span class="bad">$20/mo subscription won't work</span> for this</li>
+                </ul>
+                <div class="stat-grid" style="margin-top: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-number">$3-10</div>
+                        <div class="stat-label">per day<br>light</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$30-50</div>
+                        <div class="stat-label">per day<br>moderate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$150+</div>
+                        <div class="stat-label">per day<br>heavy (Opus)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: USE CASES & NEXT STEPS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>💡 <span class="grad">Your Use Cases</span></h1>
+            <div class="subtitle">What do you want to build?</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💡 Share Your Use Case</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>📥 <span class="highlight">Inbox zero</span> assistant</li>
+                    <li>🛒 <span class="highlight">Grocery shopping</span> automation</li>
+                    <li>🤝 B2B <span class="highlight">outreach</span> system</li>
+                    <li>📅 <span class="highlight">Calendar</span> management</li>
+                    <li>📚 Research <span class="highlight">summarizer</span></li>
+                </ul>
+                <p style="margin-top: 30px; font-size: 1.2rem; color: var(--text-muted);">Share your idea in <span class="highlight">WhatsApp</span></p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>📝 Before Next Session</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>✅ <span class="highlight">Finish installation</span></li>
+                    <li>💬 Get <span class="highlight">Telegram</span> working</li>
+                    <li>🚀 Send your <span class="highlight">first real prompt</span></li>
+                    <li>💡 Share your <span class="highlight">use case</span> in WhatsApp</li>
+                    <li>🆘 Stuck? Ask <span class="highlight">coding agent</span> first</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>❓ <span class="grad">Questions?</span></h1>
+            <div class="subtitle">Q&amp;A</div>
+            <div style="margin-top: 60px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">WhatsApp group for follow-ups</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Workshop 2: Power Features</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e8e8ed;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.45);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%; height: 100%;
+            display: none;
+            padding: 70px 100px;
+            position: absolute; top: 0; left: 0;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute; top: 30px; left: 100px; right: 100px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 3.8rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 16px; }
+        h2 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; margin-bottom: 24px; }
+        h3 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 20px 0 12px 0; letter-spacing: -0.01em; }
+
+        .slide-content { margin-top: 100px; flex: 1; }
+
+        p, li { font-size: 1.35rem; line-height: 1.8; color: var(--text-dim); font-weight: 400; }
+        ul { list-style: none; margin: 16px 0; }
+        li { margin: 12px 0; padding-left: 28px; position: relative; }
+        li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .highlight { color: #fff; font-weight: 600; }
+        .bad { color: var(--red); font-weight: 600; }
+        .warn { color: var(--orange); font-weight: 500; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+        .three-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 24px; }
+
+        .column {
+            background: var(--surface); padding: 32px;
+            border-radius: var(--radius); border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .column h3 { margin-top: 0; }
+
+        .quote {
+            font-size: 1.3rem; color: var(--text-dim);
+            border-left: 3px solid var(--accent); padding-left: 24px; margin: 32px 0;
+            font-weight: 400;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.03); padding: 28px; border-radius: var(--radius);
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 1rem;
+            color: var(--text); margin: 20px 0; white-space: pre; overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 1.2rem; }
+        th, td { padding: 20px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            transition: width 0.3s ease; z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed; bottom: 24px; right: 40px;
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.1) 0%, var(--bg) 70%);
+        }
+        .title-slide .subtitle { font-size: 1.6rem; }
+        .title-slide h1 { font-size: 5rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; }
+        .title-slide h1 .grad { background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: var(--text-muted); margin-top: 8px; font-weight: 400; }
+
+        .section-number {
+            font-size: 10rem; font-weight: 900;
+            color: #fff; opacity: 0.03; position: absolute; top: 10px; right: 80px;
+            letter-spacing: -0.05em;
+        }
+
+        .prompt-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius); padding: 20px 24px;
+            margin: 16px 0; font-size: 1.05rem; line-height: 1.6; max-width: 750px;
+            color: var(--text);
+        }
+        .prompt-block::before {
+            content: "Prompt";
+            display: block; font-size: 0.7rem; color: var(--accent);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+        }
+
+        .flow-diagram { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 30px 0; flex-wrap: wrap; }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; text-align: center; min-width: 160px; flex: 1; max-width: 220px;
+            backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .flow-step .step-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .flow-step .step-text { font-size: 0.95rem; color: var(--text-dim); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-muted); display: flex; align-items: center; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+        .stat-label { font-size: 1rem; color: var(--text-muted); margin-top: 8px; }
+
+        .step-sequence { display: flex; gap: 16px; margin: 24px 0; }
+        .step-box {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; text-align: center;
+        }
+        .step-box.active-step {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-color: transparent;
+        }
+        .step-box .step-num { font-size: 2.2rem; font-weight: 800; opacity: 0.15; margin-bottom: 8px; color: #fff; }
+        .step-box.active-step .step-num { opacity: 0.3; }
+        .step-box .step-label { font-size: 1rem; color: var(--text-dim); }
+        .step-box.active-step .step-label { color: #fff; }
+
+        .column-accent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.03));
+            border-color: rgba(99,102,241,0.2);
+        }
+        .column-accent h3 { color: #fff; }
+        .column-accent li { color: var(--text); }
+
+        .column-green {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03));
+            border-color: rgba(34,197,94,0.2);
+        }
+        .column-green h3 { color: var(--green); }
+
+        .column-orange {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.03));
+            border-color: rgba(245,158,11,0.2);
+        }
+        .column-orange h3 { color: var(--orange); }
+
+        .tag {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-red { background: rgba(239,68,68,0.12); color: var(--red); }
+        .tag-accent { background: var(--accent-glow); color: var(--accent); }
+
+        .tool-chip {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+        }
+        .tool-chip-accent { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); color: var(--accent); }
+
+        .emoji-demo {
+            display: flex; gap: 24px; justify-content: center; margin: 32px 0; flex-wrap: wrap;
+        }
+        .emoji-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px 32px; text-align: center;
+            min-width: 140px;
+        }
+        .emoji-card .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+        .emoji-card .emoji-label { font-size: 0.9rem; color: var(--text-muted); }
+        .emoji-card .emoji-meaning { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        @media (min-width: 1600px) { html { font-size: 18px; } }
+        @media (min-width: 1920px) {
+            html { font-size: 20px; }
+            .slide { padding: 80px 140px; }
+            .slide-title { left: 140px; right: 140px; }
+            .flow-step { min-width: 160px; padding: 24px 28px; }
+            .flow-step .step-icon { font-size: 2.2rem; }
+            .stat-card { padding: 40px; }
+            .stat-number { font-size: 3.2rem; }
+            .column { padding: 40px; }
+            .two-columns { gap: 40px; }
+            .step-sequence { gap: 24px; }
+            .step-box { padding: 32px; }
+            .prompt-block { padding: 28px 32px; max-width: 900px; font-size: 1.15rem; }
+            table { font-size: 1.3rem; }
+            th, td { padding: 24px 32px; }
+        }
+        @media (min-width: 2400px) {
+            html { font-size: 24px; }
+            .slide { padding: 100px 200px; }
+            .slide-title { left: 200px; right: 200px; }
+            h1 { font-size: 4.5rem; }
+            .title-slide h1 { font-size: 6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 1.6rem; }
+            .flow-diagram { gap: 20px; }
+            .flow-step { min-width: 180px; padding: 28px 32px; }
+            .stat-grid { gap: 36px; }
+            .stat-card { padding: 48px; }
+            .stat-number { font-size: 3.6rem; }
+            .column { padding: 48px; }
+            .two-columns { gap: 50px; }
+            .prompt-block { padding: 32px 40px; max-width: 1100px; font-size: 1.25rem; }
+            .quote { font-size: 1.5rem; padding-left: 32px; }
+            .code-block { padding: 36px; font-size: 1.1rem; }
+            table { font-size: 1.4rem; }
+            th, td { padding: 28px 36px; }
+            li { margin: 16px 0; }
+            .progress-bar { height: 3px; }
+        }
+        @media (min-width: 3200px) {
+            html { font-size: 30px; }
+            .slide { padding: 120px 260px; }
+            .slide-title { left: 260px; right: 260px; }
+            .title-slide h1 { font-size: 7rem; }
+            .stat-grid { gap: 48px; }
+            .stat-card { padding: 56px; }
+            .column { padding: 56px; }
+            .progress-bar { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- ==================== TITLE ==================== -->
+        <div class="slide title-slide active">
+            <h1>🦀 <span class="grad">OpenClaw Sprint C1</span></h1>
+            <div class="subtitle">Workshop 2: Power Features</div>
+            <p style="margin-top: 48px; color: var(--text-muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <!-- ==================== WELCOME BACK ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>👋 Welcome Back</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    Last time: <span class="highlight">installed &amp; connected</span>
+                </p>
+                <p style="font-size: 1.6rem; margin-bottom: 40px; color: var(--text-dim);">
+                    Today: make it <span style="color: var(--accent); font-weight: 700;">actually useful</span>
+                </p>
+                <ul>
+                    <li>❓ Quick check &mdash; any blockers from last week?</li>
+                    <li>🎯 Goal: agent runs <span class="highlight">autonomously</span> by end of today</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== MENTAL MODELS ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>🧠 Mental Model: The Setup Tax</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 32px; color: #fff;">
+                    OpenClaw was built for <span style="color: var(--accent);">tinkerers and hackers</span>.
+                </p>
+                <p style="font-size: 1.4rem; margin-bottom: 32px; color: var(--text-dim);">
+                    It was <span class="highlight">not meant to be easy</span> to set up. We're making it as smooth as we can.
+                </p>
+                <ul>
+                    <li>🪪 It's like onboarding a <span class="highlight">new employee</span> &mdash; they need access to everything</li>
+                    <li>😤 Many things <span class="bad">don't work in one click</span> &mdash; expect frustration</li>
+                    <li>✅ But once it's done, <span class="highlight">it's done</span> &mdash; you never set it up again</li>
+                    <li>🚪 <span class="warn">This is where most people give up</span></li>
+                    <li>🤝 That's why <span class="highlight">we're here</span></li>
+                </ul>
+                <div class="quote" style="margin-top: 32px;">The setup is the hardest part. Today might be frustrating. That's normal. Push through it &mdash; the payoff is an employee that works 24/7.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔄 Mental Model: Close the Loop</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: #fff;">
+                    Don't accept <span style="color: var(--red);">&ldquo;I tried but it didn't work&rdquo;</span>
+                </p>
+                <p style="font-size: 1.3rem; margin-bottom: 32px; color: var(--text-dim);">
+                    Train your agent to <span class="highlight">test itself</span> until the task is actually complete.
+                </p>
+                <div class="two-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">❌ Bad</h3>
+                        <ul>
+                            <li>&ldquo;Set up email&rdquo;</li>
+                            <li>Agent configures IMAP</li>
+                            <li>&ldquo;Done!&rdquo;</li>
+                            <li><span class="bad">...but it doesn't actually work</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>✅ Good</h3>
+                        <ul>
+                            <li>&ldquo;Set up email <span class="highlight">and send me a test email to confirm it works</span>&rdquo;</li>
+                            <li>Agent configures IMAP</li>
+                            <li>Agent sends test email</li>
+                            <li>Agent verifies delivery</li>
+                            <li><span class="highlight">&ldquo;Done &mdash; check your inbox&rdquo;</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.2rem; color: var(--accent); font-weight: 600;">Always ask: &ldquo;...and verify it works&rdquo;</p>
+            </div>
+        </div>
+
+        <!-- ==================== TODAY'S PLAN ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>📋 Today's Plan</h2></div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🔧 Power Features</h3>
+                        <ul>
+                            <li>🫡 Ack emojis &mdash; <span class="highlight">quality of life</span></li>
+                            <li>⏰ Cron jobs &amp; scheduling</li>
+                            <li>🌐 Browser automations</li>
+                            <li>🔐 1Password integration</li>
+                            <li>🧩 Skills &mdash; install &amp; use</li>
+                            <li>📁 File sharing (Drive &amp; Mac)</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>💡 Use Cases</h3>
+                        <ul>
+                            <li>📝 Meeting summary</li>
+                            <li>📱 Social media management</li>
+                            <li>🎧 Customer support automation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: ACK EMOJIS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🫡 <span class="grad">Ack Emojis</span></h1>
+            <div class="subtitle">Know what your agent is doing</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🫡 The Problem: Is It Working?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: var(--text);">
+                    You send a message. <span class="highlight">Nothing happens for 30 seconds.</span>
+                </p>
+                <ul>
+                    <li>❓ Did it <span class="highlight">receive</span> my message?</li>
+                    <li>❓ Is it <span class="highlight">thinking</span> or crashed?</li>
+                    <li>❓ Should I <span class="highlight">resend</span>?</li>
+                </ul>
+                <p style="margin-top: 32px; font-size: 1.4rem; font-weight: 700; color: var(--accent);">
+                    Ack emojis solve this &rarr; instant visual feedback
+                </p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🫡 How It Works</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 32px;">Agent <span class="highlight">reacts to your message</span> as it processes</p>
+                <div class="emoji-demo">
+                    <div class="emoji-card">
+                        <div class="emoji">👀</div>
+                        <div class="emoji-label"><strong>Seen</strong></div>
+                        <div class="emoji-meaning">Message received</div>
+                    </div>
+                    <div class="emoji-card">
+                        <div class="emoji">🫡</div>
+                        <div class="emoji-label"><strong>Working</strong></div>
+                        <div class="emoji-meaning">Processing your request</div>
+                    </div>
+                    <div class="emoji-card">
+                        <div class="emoji">✅</div>
+                        <div class="emoji-label"><strong>Done</strong></div>
+                        <div class="emoji-meaning">Task completed</div>
+                    </div>
+                    <div class="emoji-card">
+                        <div class="emoji">❌</div>
+                        <div class="emoji-label"><strong>Failed</strong></div>
+                        <div class="emoji-meaning">Something went wrong</div>
+                    </div>
+                </div>
+                <p style="font-size: 1.1rem; color: var(--text-muted); margin-top: 24px;">Configurable per channel &mdash; Telegram, Discord, Slack</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🫡 Setting It Up</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="prompt-block" style="max-width: 100%;">Enable ack emoji reactions on Telegram so I can see when you receive and start processing my messages. Use 👀 for received, 🫡 for working, ✅ for done.</div>
+                <p style="margin-top: 24px; font-size: 1.1rem; color: var(--text-muted);">Small change, <span class="highlight">huge quality of life improvement</span>.</p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Ack Emojis</div>
+        </div>
+
+        <!-- ==================== SECTION: CRON JOBS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>⏰ <span class="grad">Cron Jobs &amp; Scheduling</span></h1>
+            <div class="subtitle">Make agents work while you sleep</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>⏰ Why Scheduling Matters</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 32px; color: #fff;">
+                    Without scheduling: you <span class="highlight">ask</span>, it <span class="highlight">answers</span>.
+                </p>
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 40px; color: var(--accent);">
+                    With scheduling: it works <span class="highlight">on its own</span>.
+                </p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Heartbeat (Workshop 1)</h3>
+                        <ul>
+                            <li>Runs every <span class="highlight">N minutes</span></li>
+                            <li>Batch multiple checks</li>
+                            <li>Good for <span class="highlight">periodic monitoring</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Cron Jobs (NEW)</h3>
+                        <ul>
+                            <li><span class="highlight">Exact timing</span> &mdash; "9am Monday"</li>
+                            <li>One-shot <span class="highlight">reminders</span></li>
+                            <li>Isolated from main session</li>
+                            <li>Can use <span class="highlight">different models</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>⏰ Cron Job Types</h2></div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>⏱️ One-shot</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">"Remind me in 20 minutes"</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 12px;">Fires once, then done</p>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>🔁 Recurring</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">"Every day at 6am, check my emails"</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 12px;">Repeats on a schedule</p>
+                    </div>
+                    <div class="column">
+                        <h3>📅 Cron expression</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">"Every weekday at 9am"</p>
+                        <div class="code-block" style="font-size: 0.85rem; padding: 12px 16px; margin-top: 12px;">0 9 * * 1-5</div>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 28px;">Every morning at 8am, check my Gmail for any urgent emails and send me a summary on Telegram.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>⏰ Real Examples</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>📧 <span class="highlight">8am daily</span> &mdash; Email digest of overnight messages</li>
+                    <li>📊 <span class="highlight">Monday 9am</span> &mdash; Weekly revenue report</li>
+                    <li>🐦 <span class="highlight">Every 4 hours</span> &mdash; Check Twitter mentions</li>
+                    <li>📰 <span class="highlight">6pm daily</span> &mdash; Hacker News top stories summary</li>
+                    <li>💡 <span class="highlight">6am daily</span> &mdash; LinkedIn post ideas based on trending topics</li>
+                </ul>
+                <p style="margin-top: 32px; font-size: 1.3rem; color: var(--text);">
+                    The agent becomes a <span class="highlight">proactive employee</span>, not a reactive tool.
+                </p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Creating a Cron Job</div>
+        </div>
+
+        <!-- ==================== SECTION: BROWSER ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🌐 <span class="grad">Browser Automations</span></h1>
+            <div class="subtitle">Your agent browses the web</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🌐 What the Browser Can Do</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; margin-bottom: 32px; color: var(--text-dim);">The agent gets a <span class="highlight">real browser</span> &mdash; click, type, navigate</p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🔍 Research</h3>
+                        <ul>
+                            <li>Search and <span class="highlight">summarize</span> results</li>
+                            <li>Read articles, extract <span class="highlight">key info</span></li>
+                            <li>Compare <span class="highlight">products</span> and prices</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>⚡ Automation</h3>
+                        <ul>
+                            <li><span class="highlight">Log in</span> to websites</li>
+                            <li>Fill <span class="highlight">forms</span></li>
+                            <li><span class="highlight">Post</span> to social media</li>
+                            <li>Take <span class="highlight">screenshots</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🌐 Browser Profiles</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🧹 openclaw profile</h3>
+                        <ul>
+                            <li>Clean, <span class="highlight">isolated</span> browser</li>
+                            <li>Not logged into anything</li>
+                            <li>Safe for <span class="highlight">research</span></li>
+                            <li>Has <span class="highlight">audio</span> &mdash; can play music!</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>👤 user profile (via MCP)</h3>
+                        <ul>
+                            <li>Your <span class="highlight">real Chrome</span> tabs</li>
+                            <li>Already <span class="highlight">logged in</span> everywhere</li>
+                            <li>Uses <span class="highlight">Chrome DevTools MCP</span></li>
+                            <li>Requires <span class="highlight">remote debugging</span> enabled</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.1rem; color: var(--text-muted);">Tip: use openclaw profile + <span class="highlight">1Password</span> to log in safely, or user profile to reuse your sessions</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🌐 Setting Up User Profile (MCP)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Let your agent control your <span class="highlight">real browser</span> &mdash; with all your logins</p>
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label">Open Chrome</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">chrome://inspect</p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label">Enable <span class="highlight">remote debugging</span></div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">#remote-debugging tab</p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">Allow</span> the dialog</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Chrome asks for permission</p>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label">Agent sees your <span style="color: #fff;">real tabs</span></div>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 6px;">All sessions, all logins</p>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 24px;">Open YouTube Music and play some feel-good music for me.</div>
+                <p style="margin-top: 16px; font-size: 1rem; color: var(--orange);">⚠️ Agent gets access to everything in your browser &mdash; be mindful of what&rsquo;s open</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🌐 Browser + 1Password = Magic</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">💬</div><div class="step-text">"Log into<br>LinkedIn"</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🔐</div><div class="step-text">Fetches creds<br>from <strong style="color:#fff;">1Password</strong></div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🔑</div><div class="step-text">Gets <strong style="color:#fff;">TOTP</strong><br>2FA code</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">✅</div><div class="step-text"><strong style="color:var(--green);">Logged in</strong><br>Ready to work</div></div>
+                </div>
+                <p style="text-align: center; font-size: 1.2rem; color: var(--text-dim); margin-top: 16px;">
+                    No passwords in chat. No passwords in files. <span class="highlight">Zero exposure.</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Browser Automation</div>
+        </div>
+
+        <!-- ==================== SECTION: 1PASSWORD ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔐 <span class="grad">1Password Integration</span></h1>
+            <div class="subtitle">Secure credential management</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Why 1Password?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: var(--text);">
+                    Your agent needs credentials. <span class="bad">Don't put them in text files.</span>
+                </p>
+                <div class="two-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">❌ Bad</h3>
+                        <ul>
+                            <li>Passwords in <span class="bad">TOOLS.md</span></li>
+                            <li>API keys in <span class="bad">chat history</span></li>
+                            <li>Creds in <span class="bad">environment variables</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>✅ Good</h3>
+                        <ul>
+                            <li>Agent calls <span class="highlight">op</span> CLI</li>
+                            <li>Fetches creds <span class="highlight">on demand</span></li>
+                            <li>Supports <span class="highlight">TOTP</span> (2FA codes)</li>
+                            <li>Requires <span class="highlight">your approval</span> via app</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 How It Works</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label">Install <span class="highlight">op</span> CLI</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">brew install 1password-cli</p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label">Enable <span class="highlight">desktop integration</span></div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">In 1Password app settings</p>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label">Agent runs <span class="highlight">op signin</span></div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">You approve on your device</p>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label">Fetches <span style="color: #fff;">secrets securely</span></div>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 6px;">Passwords, TOTP, API keys</p>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 24px;">Set up 1Password CLI integration so you can securely fetch my credentials when needed. I have the 1Password desktop app installed.</div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">1Password Integration</div>
+        </div>
+
+        <!-- ==================== SECTION: SKILLS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🧩 <span class="grad">Skills</span></h1>
+            <div class="subtitle">Teach your agent new tricks</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🧩 What Are Skills?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 32px; color: #fff;">
+                    Pre-built <span style="color: var(--accent);">instruction manuals</span> for your agent.
+                </p>
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 32px;">
+                    Instead of explaining how to use Twitter API from scratch &mdash;<br>
+                    install the <span class="highlight">xurl skill</span> and it just knows.
+                </p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">📦</div><div class="step-text">Install<br>skill</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">📖</div><div class="step-text">Agent reads<br><strong style="color:#fff;">SKILL.md</strong></div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text">Learns<br>the tool</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">⚡</div><div class="step-text"><strong style="color:var(--green);">Uses it</strong><br>automatically</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🧩 Built-in Skills</h2></div>
+            <div class="slide-content">
+                <table>
+                    <tr><th>Skill</th><th>What it does</th></tr>
+                    <tr><td><span class="highlight">🔐 1password</span></td><td>Secure credential management</td></tr>
+                    <tr><td><span class="highlight">🐙 github</span></td><td>Issues, PRs, CI/CD via gh CLI</td></tr>
+                    <tr><td><span class="highlight">📧 gog</span></td><td>Gmail, Calendar, Drive, Contacts, Sheets, Docs</td></tr>
+                    <tr><td><span class="highlight">🐦 xurl</span></td><td>Twitter/X API &mdash; post, reply, search, DM</td></tr>
+                    <tr><td><span class="highlight">💬 slack</span></td><td>Slack control &mdash; messages, reactions, pins</td></tr>
+                    <tr><td><span class="highlight">🌤️ weather</span></td><td>Weather and forecasts</td></tr>
+                    <tr><td><span class="highlight">🎙️ whisper</span></td><td>Local speech-to-text</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🧩 Installing Skills</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;">Two sources:</p>
+                <div class="two-columns">
+                    <div class="column column-green">
+                        <h3>Built-in (safe)</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Ship with OpenClaw</p>
+                        <div class="code-block" style="font-size: 0.9rem; padding: 16px;">Already available</div>
+                    </div>
+                    <div class="column column-orange">
+                        <h3>ClawHub (⚠️ vet first)</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Community marketplace</p>
+                        <div class="code-block" style="font-size: 0.9rem; padding: 16px;">openclaw skill install &lt;name&gt;</div>
+                        <p style="font-size: 0.9rem; color: var(--orange); margin-top: 12px;">⚠️ ~20% are malicious &mdash; always review</p>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 24px;">Show me what skills are already installed. Also, can you find a skill for managing Google Calendar?</div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Skills</div>
+        </div>
+
+        <!-- ==================== SECTION: FILE SHARING ==================== -->
+
+        <div class="slide title-slide">
+            <h1>📁 <span class="grad">File Sharing</span></h1>
+            <div class="subtitle">Google Drive &amp; macOS</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>📁 Getting Files to Your Agent</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; margin-bottom: 32px; color: var(--text-dim);">Your agent lives in a <span class="highlight">workspace folder</span>. It needs files there.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>💬 Telegram / Chat</h3>
+                        <ul>
+                            <li>Send files <span class="highlight">directly</span></li>
+                            <li>Images, PDFs, docs</li>
+                            <li>Best for <span class="highlight">quick shares</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>☁️ Google Drive</h3>
+                        <ul>
+                            <li>Use <span class="highlight">gog</span> skill</li>
+                            <li>Agent reads/writes Drive files</li>
+                            <li>Sheets, Docs, spreadsheets</li>
+                            <li>Best for <span class="highlight">shared data</span></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>🖥️ macOS Shared Folder</h3>
+                        <ul>
+                            <li>Drop files in <span class="highlight">shared directory</span></li>
+                            <li>Agent picks them up</li>
+                            <li>Best for <span class="highlight">local workflows</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>☁️ Google Drive Setup</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="prompt-block" style="max-width: 100%; margin-bottom: 24px;">Set up Google Drive access using the gog skill so you can read and write files from my Google Drive.</div>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">🧩</div><div class="step-text">gog skill<br>installed</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🔑</div><div class="step-text">OAuth<br>login</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">📂</div><div class="step-text">Access<br>Drive files</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">📊</div><div class="step-text"><strong style="color:var(--green);">Read/write</strong><br>Sheets, Docs</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">File Sharing</div>
+        </div>
+
+        <!-- ==================== SECTION: USE CASES ==================== -->
+
+        <div class="slide title-slide">
+            <h1>💡 <span class="grad">Use Cases</span></h1>
+            <div class="subtitle">Putting it all together</div>
+        </div>
+
+        <!-- USE CASE 1: Meeting Summary -->
+        <div class="slide">
+            <div class="section-number">01</div>
+            <div class="slide-title"><h2>📝 Use Case: Meeting Summary</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Record a meeting &rarr; get <span class="highlight">summary + action items</span> in Telegram</p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">🎤</div><div class="step-text">Record<br>meeting</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">📁</div><div class="step-text">Share audio<br>file</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🎙️</div><div class="step-text">Whisper<br>transcribes</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text">AI extracts<br>key points</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">✅</div><div class="step-text"><strong style="color:var(--green);">Summary</strong><br>+ action items</div></div>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="column">
+                        <h3>Features used</h3>
+                        <ul>
+                            <li>🎙️ <span class="highlight">Whisper</span> skill (voice-to-text)</li>
+                            <li>📁 File sharing</li>
+                            <li>☁️ Google Drive (save notes)</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Output</h3>
+                        <ul>
+                            <li>📋 Meeting <span class="highlight">summary</span></li>
+                            <li>✅ <span class="highlight">Action items</span> with owners</li>
+                            <li>📧 Follow-up email draft</li>
+                            <li>📅 Calendar events created</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USE CASE 2: Social Media -->
+        <div class="slide">
+            <div class="section-number">02</div>
+            <div class="slide-title"><h2>📱 Use Case: Social Media Management</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Daily post ideas &rarr; drafts &rarr; <span class="highlight">automated posting</span></p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">⏰</div><div class="step-text">Cron:<br>6am daily</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🌐</div><div class="step-text">Browse<br>trending topics</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">✍️</div><div class="step-text">Draft<br>3 post ideas</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">💬</div><div class="step-text">Send to you<br>for approval</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">🚀</div><div class="step-text"><strong style="color:var(--green);">Post</strong><br>to LinkedIn/X</div></div>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="column">
+                        <h3>Features used</h3>
+                        <ul>
+                            <li>⏰ <span class="highlight">Cron jobs</span> (daily schedule)</li>
+                            <li>🌐 <span class="highlight">Browser</span> (research trends)</li>
+                            <li>🔐 <span class="highlight">1Password</span> (login to platforms)</li>
+                            <li>🐦 <span class="highlight">xurl</span> skill (X/Twitter posting)</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Platforms</h3>
+                        <ul>
+                            <li>🔗 LinkedIn (via browser)</li>
+                            <li>🐦 X/Twitter (via xurl skill)</li>
+                            <li>📸 Instagram (via browser)</li>
+                            <li>📝 Substack (via browser)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USE CASE 3: Customer Support -->
+        <div class="slide">
+            <div class="section-number">03</div>
+            <div class="slide-title"><h2>🎧 Use Case: Customer Support Automation</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Monitor support channels &rarr; <span class="highlight">auto-respond or escalate</span></p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">📧</div><div class="step-text">Email<br>arrives</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text">Classify<br>intent</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">📚</div><div class="step-text">Check<br>knowledge base</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🔀</div><div class="step-text">Route:<br>auto or human?</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">📨</div><div class="step-text"><strong style="color:var(--green);">Reply</strong><br>or escalate</div></div>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="column">
+                        <h3>Features used</h3>
+                        <ul>
+                            <li>⏰ <span class="highlight">Cron</span> (check inbox every 15 min)</li>
+                            <li>📧 <span class="highlight">IMAP</span> (read/send email)</li>
+                            <li>🌐 <span class="highlight">Browser</span> (check docs)</li>
+                            <li>📁 <span class="highlight">Files</span> (FAQ / knowledge base)</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Smart routing</h3>
+                        <ul>
+                            <li>🟢 Simple question &rarr; <span class="highlight">auto-reply</span></li>
+                            <li>🟡 Needs context &rarr; <span class="highlight">draft + review</span></li>
+                            <li>🔴 Angry customer &rarr; <span class="highlight">escalate to you</span></li>
+                            <li>💰 Sales inquiry &rarr; <span class="highlight">forward to team</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: PUTTING IT TOGETHER ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🏗️ The Stack</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 70%;">
+                <p style="font-size: 1.5rem; margin-bottom: 32px; color: var(--text-dim);">Everything connects:</p>
+                <div class="stat-grid" style="width: 100%; max-width: 900px;">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">⏰</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Cron triggers</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">When to act</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🌐</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Browser executes</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">How to act</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔐</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">1Password secures</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Safe access</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🧩</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Skills extend</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">New abilities</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">📁</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Files connect</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Data in &amp; out</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🫡</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Ack emojis confirm</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">You stay in the loop</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: USEFUL COMMANDS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>⌨️ <span class="grad">Useful Commands</span></h1>
+            <div class="subtitle">Shortcuts you'll use daily</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>⌨️ Chat Commands</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.3rem; margin-bottom: 24px; color: var(--text-dim);">Type these <span class="highlight">directly in Telegram</span> to control your agent</p>
+                <table>
+                    <tr><th>Command</th><th>What it does</th></tr>
+                    <tr><td><span class="highlight">/models</span></td><td>Switch AI model (Sonnet &rarr; Opus, GPT-4, etc). Cheaper or smarter on demand.</td></tr>
+                    <tr><td><span class="highlight">/restart</span></td><td>Restart the agent. Clears stuck state, reloads workspace files.</td></tr>
+                    <tr><td><span class="highlight">/context</span></td><td>Show current context window usage. See how much memory the agent is using.</td></tr>
+                    <tr><td><span class="highlight">/status</span></td><td>Session status &mdash; model, usage, cost, uptime.</td></tr>
+                    <tr><td><span class="highlight">/reasoning</span></td><td>Toggle extended thinking. Agent "thinks harder" on complex tasks.</td></tr>
+                    <tr><td><span class="highlight">/tasks</span></td><td>View running background tasks &mdash; cron jobs, sub-agents, long-running work.</td></tr>
+                </table>
+                <p style="margin-top: 24px; font-size: 1.1rem; color: var(--text-muted);">💡 Pro tip: use <span class="highlight">/models</span> to switch to a cheaper model for simple tasks, and Opus for complex ones.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: HOMEWORK ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>📝 Before Next Session</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>✅ Set up <span class="highlight">ack emojis</span> on Telegram</li>
+                    <li>⏰ Create at least <span class="highlight">one cron job</span></li>
+                    <li>🌐 Try a <span class="highlight">browser automation</span></li>
+                    <li>🔐 Set up <span class="highlight">1Password</span> (if you use it)</li>
+                    <li>💡 Build your <span class="highlight">first use case</span></li>
+                    <li>🆘 Stuck? Ask <span class="highlight">coding agent</span> first</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>❓ <span class="grad">Questions?</span></h1>
+            <div class="subtitle">Q&amp;A</div>
+            <div style="margin-top: 60px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">WhatsApp group for follow-ups</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
