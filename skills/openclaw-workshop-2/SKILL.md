@@ -148,7 +148,39 @@ Or get specific:
 
 ---
 
-### Use Case 2: Research & Book a Calendar Event 📅
+### Use Case 2: Disk Cleanup -- Your Agent Sees Everything 🗂️
+
+> Your agent scans your entire home folder, finds the biggest space wasters, and helps you safely clean up.
+
+**What we're doing:** Ask your agent to scan your user folder for large files and present the absolute safest ones to delete -- old downloads, cache files, duplicate media, forgotten .dmg installers. Nothing risky. The agent shows you exactly what it found, how much space each takes, and only suggests things that are genuinely safe to remove.
+
+**What this really teaches:** This isn't about disk space. This is the "oh wow" moment where they realize: *my agent can see my entire filesystem.* It can read files, navigate folders, and understand what's on their computer. That's the power -- and the responsibility -- of having an AI agent with real system access.
+
+**Prompt to try:**
+> Scan my home folder and find the largest files and folders that are safe to delete. I'm talking about things like old .dmg installers in Downloads, Xcode caches, old Zoom recordings, duplicate files, and anything clearly temporary. Be very conservative -- only suggest things that are absolutely safe to remove. Show me what you find with file sizes before deleting anything.
+
+**What to watch for:**
+- Does it scan real directories? (~/Downloads, ~/Library/Caches, ~/Movies, etc.)
+- Does it find genuinely large files?
+- Is it conservative? It should NEVER suggest deleting documents, photos, code, or anything ambiguous
+- Does it show sizes and ask for confirmation before touching anything?
+
+**Safe categories to look for:**
+- `.dmg` and `.pkg` installers in Downloads
+- `node_modules` in old project folders
+- Xcode derived data (`~/Library/Developer/Xcode/DerivedData`)
+- Homebrew cache (`~/Library/Caches/Homebrew`)
+- Old Zoom/meeting recordings
+- `.zip` files that have already been extracted
+- Trash that hasn't been emptied
+
+**The conversation to have:** After the agent presents its findings, talk about what this means. Your agent has access to everything on this machine. That's why we set up a dedicated user account in Workshop 1. That's why we treat it like an employee -- it can see your files, but we've limited what it can do with them.
+
+**Done when:** The agent finds real large files and the student reviews and optionally deletes some. The important thing isn't the cleanup -- it's the realization of what the agent can access.
+
+---
+
+### Use Case 3: Research & Book a Calendar Event 📅
 
 > Your agent researches something fun to do and books it into your calendar -- then invites you.
 
@@ -171,7 +203,7 @@ Or get specific:
 
 ---
 
-### Use Case 3: Tweet Something (Optional) 🐦
+### Use Case 4: Tweet Something (Optional) 🐦
 
 > Set up X/Twitter integration and post your first automated tweet.
 
@@ -198,7 +230,7 @@ Or get specific:
 
 ---
 
-### Use Case 4: Meeting Summary → Apple Notes 📝
+### Use Case 5: Meeting Summary → Apple Notes 📝
 
 > Record or find a meeting recording, transcribe it locally, extract action items, and put them in Apple Notes.
 
@@ -233,7 +265,7 @@ osascript -e 'tell application "Notes" to make new note at folder "Notes" with p
 
 ---
 
-### Use Case 5: Morning News Briefing ☀️
+### Use Case 6: Morning News Briefing ☀️
 
 > Set up a cron job that delivers a personalized news briefing to your Telegram every morning.
 
@@ -263,7 +295,7 @@ Check that the cron job exists and is set for the right time.
 
 ---
 
-### Use Case 6: Your Own Automation 💡
+### Use Case 7: Your Own Automation 💡
 
 > You've seen what's possible. Now build something that solves YOUR problem.
 
@@ -323,6 +355,7 @@ Setup:
 
 Use Cases:
 🎵 Played music via browser automation
+🗂️ Scanned your filesystem and cleaned up safe-to-delete files
 📅 Researched an event and booked it into your calendar
 🐦 Posted a tweet (or skipped -- that's cool too)
 📝 Transcribed a meeting and put action items in Apple Notes
