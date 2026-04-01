@@ -97,9 +97,24 @@ Skills are pre-built instruction manuals that teach your agent new abilities ins
 Key skills we'll use today:
 - **gog** -- Gmail, Calendar, Drive (should already be configured)
 - **whisper** -- speech-to-text (should be set up from Workshop 1)
-- **xurl** -- Twitter/X (we'll set this up in Use Case 3)
+- **xurl** -- Twitter/X (we'll set this up in Use Case 4)
 
-*A word of caution about ClawHub:* Community marketplace has 2,800+ skills, but ~20% are malicious. Always review before installing.
+**Now let's install a skill from the marketplace.**
+
+Skills live on [skills.sh](https://skills.sh) (also known as [clawhub.ai](https://clawhub.ai)). This is the community marketplace -- thousands of skills you can add with one command. Let the student browse and pick one that interests them, or suggest one that's relevant to their use case.
+
+*Setup prompt:*
+> Browse skills.sh and find a skill that looks useful to me. Show me what it does before installing. Then install it.
+
+Or if they want something specific:
+> Install the [skill name] skill from skills.sh.
+
+**What to watch for:**
+- Does the agent find and explain the skill before installing?
+- Does the installation work?
+- Can the agent actually use the new skill?
+
+**A word of caution:** The marketplace has 2,800+ skills, but ~20% are malicious. Always review what a skill does before installing. Built-in skills are safe. Marketplace skills need vetting -- read the description, check the author, and don't install anything that asks for permissions it shouldn't need.
 
 ---
 
