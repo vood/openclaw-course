@@ -1,202 +1,369 @@
 ---
 name: openclaw-workshop-2
-description: "OpenClaw Workshop 2: Power Features. Interactive checklist that guides users through setting up ack emojis, cron jobs, browser automations, 1Password, skills, and file sharing. Use when the user says 'workshop 2', 'openclaw power features', 'openclaw advanced setup', or has completed workshop 1 and wants to continue."
+description: "OpenClaw Workshop 2: Power Features. Interactive checklist that guides users through setup (ack emojis, cron, 1Password, skills) then hands-on use cases (YouTube Music, calendar booking, Twitter, meeting summary to Apple Notes, morning briefing cron, custom automation). Use when the user says 'workshop 2', 'openclaw power features', or has completed workshop 1."
 ---
 
 # OpenClaw Workshop 2: Power Features
 
-You are running an interactive workshop checklist. Your job is to:
+## Your Role
 
-1. **List all tasks** below with their completion status
-2. **Check each task** by inspecting the actual system state (files, configs, running processes)
-3. **Offer to tackle incomplete tasks** one at a time, in order
-4. **Mark the workshop complete** when all tasks pass verification
+You're continuing the journey with someone who already has a working OpenClaw agent. Last time they built the foundation. Today they transform their agent from a chatbot into an autonomous employee -- and they'll do it by building real things.
+
+The workshop has two parts:
+1. **Setup** -- configure the remaining power features (quick, building on Workshop 1)
+2. **Use Cases** -- hands-on exercises where they actually USE what they've built
+
+When you run this workshop:
+
+1. **Welcome them back** -- acknowledge how far they've come
+2. **Check that Workshop 1 is solid**
+3. **Breeze through the setup** -- it's lighter than Workshop 1
+4. **Spend most of the time on use cases** -- this is where the magic happens
+5. **End with their own idea** -- they leave with something personal
 
 ---
 
-## Prerequisites
+## The Welcome
 
-Before starting, verify Workshop 1 is complete:
+Welcome back! Last time you set up your agent from scratch -- installed OpenClaw, connected Telegram, got voice, email, and browser working. That was the hard part.
+
+Today's different. We'll do a bit more setup, and then the fun begins: you're going to make your agent play music, book events, post tweets, summarize meetings, and deliver you a personalized morning briefing. By the end, you'll have built something you'll actually use every day.
+
+Let's see where we're at.
+
+---
+
+## Prerequisites Check
+
+Before we dive in, let's make sure Workshop 1 is solid:
 - OpenClaw installed and running
 - Telegram connected
 - Email via IMAP working
+- gog skill configured (Gmail, Calendar, Drive access)
+- Browser functional
 
-If any are missing, direct user to run Workshop 1 first.
+If anything is missing, let's fix it first. Everything today builds on this.
 
 ---
 
-## Workshop Tasks
+## Part 1: Setup
 
-### Task 1: Ack Emojis Configured
-**What:** Agent reacts to messages with emoji status indicators on Telegram.
-- :eyes: = message received
-- :saluting_face: = working/processing
-- :white_check_mark: = task completed
-- :x: = something went wrong
+> Quick configuration to unlock today's use cases. This should go fast.
 
-**How to verify:** Check openclaw config for ack emoji / reaction settings. Look in workspace files for emoji reaction configuration.
-**Setup prompt to use:**
+### Chapter 1: Quality of Life
+
+**Step 1: Ack Emojis**
+Your agent reacts to every message so you always know what's happening:
+- :eyes: = "I see your message"
+- :saluting_face: = "I'm working on it"
+- :white_check_mark: = "All done!"
+- :x: = "Something went wrong"
+
+*How to check:* Look in openclaw config for ack emoji / reaction settings.
+*Setup prompt:*
 > Enable ack emoji reactions on Telegram so I can see when you receive and start processing my messages. Use :eyes: for received, :saluting_face: for working, :white_check_mark: for done.
-**Verification:** Ask user to send a test message on Telegram and confirm they see the emoji reactions.
-**Done when:** User confirms emoji reactions appear on their Telegram messages.
 
-### Task 2: At Least One Cron Job Created
-**What:** A scheduled task (cron job) is configured and running.
-**How to verify:** Check openclaw cron configuration. List existing cron jobs in `~/.openclaw/cron/` or equivalent config location.
-**Context to share:**
-- **Heartbeat** (from Workshop 1): runs every N minutes, batch checks, periodic monitoring
-- **Cron jobs** (new): exact timing ("9am Monday"), one-shot reminders, isolated from main session, can use different models
-- Types: one-shot ("remind me in 20 min"), recurring ("every day at 6am"), cron expression (`0 9 * * 1-5`)
+*Verification:* Send a test message and watch for the reactions.
 
-**Example prompts:**
-> Every morning at 8am, check my Gmail for any urgent emails and send me a summary on Telegram.
+---
 
-Other ideas:
-- 8am daily -- email digest of overnight messages
-- Monday 9am -- weekly revenue report
-- Every 4 hours -- check Twitter mentions
-- 6pm daily -- Hacker News top stories summary
+### Chapter 2: Secure Access
 
-**Done when:** At least one cron job exists and has fired successfully (or is scheduled).
+**Step 2: 1Password Integration** *(Optional -- skip if you don't use 1Password)*
 
-### Task 3: Browser Automation Tested
-**What:** Agent can use the browser to navigate, interact with pages, and report back.
-**How to verify:** Check if browser plugin is functional. Try a simple browse command.
-**Context to share:**
-- **openclaw profile:** Clean, isolated browser. Not logged in anywhere. Safe for research. Has audio.
-- **user profile (via MCP):** Your real Chrome tabs. Already logged in everywhere. Requires remote debugging.
+Your agent needs to log into things. The right way: 1Password. Agent fetches credentials on demand, gets 2FA codes automatically, and you approve from your phone. No passwords in text files. Ever.
 
-**Setup prompt to use:**
-> Open a browser and search for the latest tech news. Summarize the top 3 stories you find.
-**Verification:** Agent successfully navigates and returns meaningful results.
-**Done when:** Browser automation produces correct results.
-
-### Task 4: 1Password Integration (Optional but Recommended)
-**What:** 1Password CLI (`op`) is installed and the agent can securely fetch credentials.
-**How to verify:** Run `which op` or `op --version`. Check if desktop integration is enabled.
-**Why it matters:** Agent needs credentials. Don't put them in text files. 1Password provides: on-demand credential fetching, TOTP 2FA codes, requires your approval via app.
-
-**Setup steps:**
-1. Install: `brew install 1password-cli`
+*How to check:* Run `which op` or `op --version`.
+*Setup:*
+1. `brew install 1password-cli`
 2. Enable desktop integration in 1Password app settings
-3. Agent runs `op signin` -- user approves on their device
+3. Agent runs `op signin` -- you approve on your phone
 
-**Setup prompt to use:**
+*Setup prompt:*
 > Set up 1Password CLI integration so you can securely fetch my credentials when needed. I have the 1Password desktop app installed.
-**Verification:** Agent successfully fetches a test credential (e.g., list vaults).
-**Done when:** `op` CLI works and agent can access 1Password, OR user explicitly skips this task.
-**Note:** Mark as skipped if user doesn't use 1Password. Not a blocker.
 
-### Task 5: Skills Explored
-**What:** User understands the skills system and has reviewed installed skills.
-**How to verify:** Check installed skills in openclaw config/workspace.
-**Context to share:**
-
-Built-in skills:
-| Skill | What it does |
-|---|---|
-| **1password** | Secure credential management |
-| **github** | Issues, PRs, CI/CD via gh CLI |
-| **gog** | Gmail, Calendar, Drive, Contacts, Sheets, Docs |
-| **xurl** | Twitter/X API -- post, reply, search, DM |
-| **slack** | Slack control -- messages, reactions, pins |
-| **weather** | Weather and forecasts |
-| **whisper** | Local speech-to-text |
-
-Two sources: Built-in (safe, ship with OpenClaw) and ClawHub (community marketplace -- **~20% are malicious, always review**).
-
-**Setup prompt to use:**
-> Show me what skills are already installed. Also, can you find a skill for managing Google Calendar?
-**Done when:** User has reviewed their installed skills and understands how to find/install new ones.
-
-### Task 6: File Sharing Method Configured
-**What:** User has at least one way to share files with the agent.
-**How to verify:** Check if gog skill is configured (Google Drive), or if a shared folder is set up.
-**Three options:**
-1. **Telegram/Chat:** Send files directly. Best for quick shares.
-2. **Google Drive:** Use gog skill. Agent reads/writes Drive files. Best for shared data.
-3. **macOS Shared Folder:** Drop files in shared directory. Agent picks them up. Best for local workflows.
-
-**Setup prompt for Google Drive:**
-> Set up Google Drive access using the gog skill so you can read and write files from my Google Drive.
-**Done when:** At least one file sharing method is working and tested.
-
-### Task 7: First Use Case Built
-**What:** User has configured at least one real-world automation combining multiple features.
-**How to verify:** Ask the user what they've built or want to build.
-**Suggested use cases:**
-
-**Meeting Summary:**
-Record meeting -> share audio -> Whisper transcribes -> AI extracts key points -> summary + action items
-Features: Whisper skill, file sharing, Google Drive
-
-**Social Media Management:**
-Cron: 6am daily -> browse trending topics -> draft 3 post ideas -> send for approval -> post to LinkedIn/X
-Features: cron jobs, browser, 1Password, xurl skill
-
-**Customer Support Automation:**
-Email arrives -> classify intent -> check knowledge base -> route: auto or human? -> reply or escalate
-Features: cron (every 15 min), IMAP, browser, files
-Smart routing: simple question = auto-reply, needs context = draft + review, angry customer = escalate, sales inquiry = forward
-
-**Done when:** User has at least one working automation that combines 2+ features.
+*If they don't use 1Password:* Skip it. Not a blocker.
 
 ---
 
-## Execution Instructions
+### Chapter 3: Skills Check
 
-When this skill is invoked:
+**Step 3: Review Installed Skills**
+Skills are pre-built instruction manuals that teach your agent new abilities instantly.
 
-1. **Check prerequisites** -- verify Workshop 1 tasks are complete.
+*Setup prompt:*
+> Show me what skills are already installed.
 
-2. **Print the checklist** with status indicators:
-   - `[ ]` = not yet verified
-   - `[~]` = partially done / needs attention
-   - `[x]` = verified complete
-   - `[--]` = skipped (for optional tasks)
+Key skills we'll use today:
+- **gog** -- Gmail, Calendar, Drive (should already be configured)
+- **whisper** -- speech-to-text (should be set up from Workshop 1)
+- **xurl** -- Twitter/X (we'll set this up in Use Case 3)
 
-3. **Run automated checks** where possible (config files, installed tools, cron listings). Don't ask for things you can check yourself.
-
-4. **Show results** and identify incomplete tasks.
-
-5. **Offer to start** on the first incomplete task. Guide step-by-step using the setup prompts above.
-
-6. **After each task**, verify it actually works (close the loop -- configure AND test).
-
-7. **Move to the next task** until all required tasks are complete.
-
-8. **When all tasks are done**, congratulate the user and display:
-   ```
-   ✅ Workshop 2 COMPLETE
-   Your OpenClaw agent is fully configured with power features.
-   
-   Recap -- what you've set up:
-   - Ack emojis for status feedback
-   - Scheduled cron jobs for autonomous work
-   - Browser automation for web tasks
-   - 1Password for secure credentials
-   - Skills system for extensibility
-   - File sharing for data exchange
-   - Your first real-world use case
-   
-   Your agent is now a proactive employee, not a reactive tool.
-   ```
+*A word of caution about ClawHub:* Community marketplace has 2,800+ skills, but ~20% are malicious. Always review before installing.
 
 ---
 
-## Key Teaching Points (share during setup)
+### Setup Complete Checkpoint
 
-- **Close the loop:** Don't accept "I tried but it didn't work." Always verify: "...and confirm it works."
-- **The setup tax is real:** OpenClaw was built for tinkerers. Many things don't work in one click. But once it's done, it's done forever.
-- **Everything connects:** Cron triggers WHEN to act, browser is HOW to act, 1Password provides SAFE access, skills add NEW abilities, files move data IN & OUT, ack emojis keep YOU in the loop.
+```
+Part 1 done! Quick recap:
+✅ Ack emojis -- visual feedback on every message
+✅ 1Password -- secure credential access (or skipped)
+✅ Skills -- reviewed and ready
 
-## Useful Chat Commands (share with user)
+Now the fun part. Let's build real things.
+```
+
+---
+
+## Part 2: Use Cases
+
+> This is why you're here. Each use case builds on the last, and by the end you'll have a genuinely useful agent.
+
+---
+
+### Use Case 1: Play Music on YouTube Music 🎵
+
+> Let's start with something fun. Your agent controls your browser and plays music for you.
+
+**What we're doing:** Tell your agent to open YouTube Music and play something you like. It navigates, searches, and hits play -- all on its own.
+
+**What this teaches:** Browser automation basics -- navigating, clicking, interacting with real websites. If it can play music, it can fill forms, post content, and do research.
+
+**Prompt to try:**
+> Open YouTube Music in the browser and play some feel-good music for me.
+
+Or get specific:
+> Open YouTube Music and play "Daft Punk - Get Lucky"
+
+**What to watch for:**
+- Does it navigate to the right site?
+- Does it find the search bar and type?
+- Does it actually play the track?
+- Can you hear it? (The openclaw browser profile has audio!)
+
+**If using 1Password:** The agent can log into your YouTube account automatically via 1Password. Otherwise it works in guest/free mode.
+
+**Celebrate:** You just told your agent to play music and it did. That's browser automation in action. Everything else today uses the same muscle.
+
+---
+
+### Use Case 2: Research & Book a Calendar Event 📅
+
+> Your agent researches something fun to do and books it into your calendar -- then invites you.
+
+**What we're doing:** The agent browses the web to find an interesting event or activity near you, picks a good time, creates a calendar event via gog, and sends an invite to your personal email.
+
+**What this teaches:** Combining browser (research) + gog skill (calendar) + real-world decision making. The agent isn't just following instructions -- it's making choices.
+
+**Important setup note:** The gog skill creates events as the OpenClaw user. The agent needs to **invite the student's personal email** so the event shows up on their calendar.
+
+**Prompt to try:**
+> Research something fun to do this weekend in [your city]. Find a specific event or activity, pick a good time, and create a calendar event for it. Make sure to invite [student's personal email] so it shows up on my calendar.
+
+**What to watch for:**
+- Does it search for real events/activities?
+- Does it pick something reasonable?
+- Does the calendar event get created?
+- Did the invite arrive at the student's email?
+
+**Close the loop:** Check that the invite actually landed in their inbox. If it didn't, troubleshoot the gog calendar permissions.
+
+---
+
+### Use Case 3: Tweet Something (Optional) 🐦
+
+> Set up X/Twitter integration and post your first automated tweet.
+
+**What we're doing:** Install and configure the xurl skill, then compose and post a real tweet. This is optional -- only if the student has a Twitter/X account they want to connect.
+
+**What this teaches:** How skills extend your agent's abilities. One install and your agent can post, reply, search, and DM on Twitter.
+
+**Setup:**
+1. Make sure the xurl skill is available
+2. Connect the Twitter/X account (API credentials needed)
+
+*Setup prompt:*
+> Set up the xurl skill for Twitter/X. Help me connect my account and post a test tweet.
+
+**Prompt to try:**
+> Write a tweet about something interesting you learned while browsing the web today. Keep it casual and authentic. Post it to my Twitter.
+
+**What to watch for:**
+- Does the skill install/configure correctly?
+- Can the agent compose something that sounds natural?
+- Does the tweet actually post?
+
+**Note:** If they don't have Twitter or don't want to connect it, skip this. Not a blocker for the rest of the workshop.
+
+---
+
+### Use Case 4: Meeting Summary → Apple Notes 📝
+
+> Record or find a meeting recording, transcribe it locally, extract action items, and put them in Apple Notes.
+
+**What we're doing:** The agent processes an audio recording with Whisper (locally -- no data leaves the machine), extracts a summary and action items, and inserts them into Apple Notes via AppleScript.
+
+**What this teaches:** The full pipeline -- file handling, local AI processing, text extraction, and macOS integration. This is a workflow people actually pay for.
+
+**Audio source:** There's a sample meeting recording included in the repo at `samples/meeting-recording.m4a` -- a ~55 second team standup with action items for several people.
+
+They can also use their own recording (QuickTime, Voice Memos, or send one via Telegram).
+
+**Prompt to try:**
+> I have a meeting recording at samples/meeting-recording.m4a. Please transcribe it using Whisper, create a clean summary with key decisions and action items, and save it to Apple Notes.
+
+**What to watch for:**
+- Does Whisper transcribe the audio correctly?
+- Is the summary clean and useful (not just a raw transcript)?
+- Are action items clearly identified?
+- Does it actually appear in Apple Notes?
+
+**The Apple Notes part:** The agent uses AppleScript to create a new note. Example:
+```
+osascript -e 'tell application "Notes" to make new note at folder "Notes" with properties {name:"Meeting Summary - [date]", body:"[content]"}'
+```
+
+**Celebrate:** You just went from raw audio to organized action items in Apple Notes, all locally, all automatic. This is a workflow that saves hours every week.
+
+---
+
+### Use Case 5: Morning News Briefing ☀️
+
+> Set up a cron job that delivers a personalized news briefing to your Telegram every morning.
+
+**What we're doing:** Creating a scheduled job that runs every morning, browses news sources relevant to YOUR interests, and sends you a concise summary before you start your day.
+
+**What this teaches:** Cron jobs (autonomous scheduling) + browser (web research) + personalization. This is the "employee that works while you sleep" moment.
+
+**Step 1: Figure out their interests.**
+Ask the student: What topics do you care about? Tech? Finance? Local news? Industry-specific stuff?
+
+**Step 2: Set up the cron job.**
+*Prompt to try:*
+> Set up a daily cron job that runs at 7:30am. Every morning, browse [Hacker News / TechCrunch / Bloomberg / their preferred sources] and send me a Telegram summary of the top 5 stories relevant to [their interests]. Keep it concise -- headlines and one-sentence summaries. Add links so I can read more if interested.
+
+**Step 3: Verify it's scheduled.**
+Check that the cron job exists and is set for the right time.
+
+**What to watch for:**
+- Is the cron job actually created?
+- Is the timing correct (right timezone!)?
+- Does a test run produce a good summary?
+- Are the stories actually relevant to their interests?
+
+**Pro tip to share:** Run the cron job manually first to test: make the agent do a briefing right now. Once it looks good, the schedule takes over.
+
+**The moment:** Tomorrow morning, they'll wake up to a personalized news briefing waiting in their Telegram. No one asked for it. The agent just did it. That's the difference between a tool and an employee.
+
+---
+
+### Use Case 6: Your Own Automation 💡
+
+> You've seen what's possible. Now build something that solves YOUR problem.
+
+**What we're doing:** The student picks their own automation and builds it with your help. This is where the workshop becomes personal.
+
+**Help them brainstorm.** Ask:
+- What's something you do every day that's repetitive?
+- What information do you wish was just... there when you woke up?
+- Is there a task you keep putting off because it's tedious?
+- What would your perfect AI employee do for you?
+
+**Ideas to spark inspiration:**
+- **Inbox zero:** Every hour, check email, auto-reply to simple ones, draft responses for complex ones, flag urgent ones on Telegram
+- **Grocery list:** "Add milk" via Telegram -> agent maintains a running Google Sheet, orders when the list is long enough
+- **LinkedIn outreach:** Daily, find 5 relevant people in your industry, draft personalized connection requests, send for your approval
+- **Competitor watch:** Weekly, check 3 competitor websites for changes, summarize what's new
+- **Expense tracking:** Forward receipts to the agent's email, it extracts amounts and categories, updates a Google Sheet
+- **Daily journal prompt:** Every evening at 9pm, send a thoughtful question based on what happened that day
+
+**The goal:** At least one working automation that combines 2+ features and solves a real problem they have.
+
+**Done when:** They've tested it, it works, and they're excited about it.
+
+---
+
+## Running the Workshop
+
+**Show progress visually:**
+- `[ ]` = we haven't gotten here yet
+- `[~]` = in progress
+- `[x]` = done and verified!
+- `[--]` = skipped (totally fine)
+
+**For setup (Part 1):** Move quickly. This should take 15-20 minutes. The foundation from Workshop 1 does most of the heavy lifting.
+
+**For use cases (Part 2):** Take your time. This is where learning happens. Let them experiment, fail, retry. Each use case should feel like a small victory.
+
+**Close every loop.** Configure AND test. The golden rule: "...and verify it works."
+
+**If something breaks:** Stay calm, stay encouraging. "That's normal. Let's figure out what happened." Debugging is part of the learning.
+
+---
+
+## The Finish Line
+
+When all use cases are complete:
+
+```
+🎉 Workshop 2 COMPLETE!
+
+Look at what you built today:
+
+Setup:
+✅ Ack emojis -- you always know what's happening
+✅ 1Password -- secure access, no passwords exposed
+✅ Skills system -- extensible and ready
+
+Use Cases:
+🎵 Played music via browser automation
+📅 Researched an event and booked it into your calendar
+🐦 Posted a tweet (or skipped -- that's cool too)
+📝 Transcribed a meeting and put action items in Apple Notes
+☀️ Set up a morning news briefing that runs every day
+💡 Built your own custom automation
+
+Workshop 1: You gave your agent a desk, phone, email, and internet.
+Workshop 2: You taught it to work, play, research, schedule, and think.
+
+Tomorrow morning you'll wake up to a personalized news briefing 
+you didn't ask for. Your calendar has a fun event you didn't 
+have to search for. Your meeting notes are in Apple Notes.
+
+That's not a chatbot. That's a teammate. Welcome to the future. 🚀
+```
+
+---
+
+## Handy Commands to Share
+
+These work in Telegram -- daily shortcuts:
 
 | Command | What it does |
 |---|---|
-| **/models** | Switch AI model (cheaper or smarter on demand) |
-| **/restart** | Restart agent, clear stuck state |
-| **/context** | Show context window usage |
-| **/status** | Session status -- model, usage, cost, uptime |
-| **/reasoning** | Toggle extended thinking |
-| **/tasks** | View running background tasks |
+| **/models** | Switch to cheaper model for simple tasks, Opus for complex ones |
+| **/restart** | Restart agent if stuck |
+| **/context** | See context window usage |
+| **/status** | Model, usage, cost, uptime |
+| **/reasoning** | Think harder on tough problems |
+| **/tasks** | See background tasks |
+
+---
+
+## Key Lessons to Weave In
+
+**Close the loop:** "Set it up" is never enough. Always: "...and verify it works."
+
+**The setup tax:** OpenClaw was built for tinkerers. Things break. That's normal. But once it works, it works forever.
+
+**Everything connects:**
+- **Cron** = WHEN to act
+- **Browser** = HOW to act on the web
+- **1Password** = SAFE access
+- **Skills** = NEW abilities
+- **gog** = Gmail, Calendar, Drive
+- **Files** = data IN and OUT
+- **Ack emojis** = YOU stay in the loop
+
+**The employee mindset:** Don't accept "I tried but it didn't work." Your agent should test its own work. Train it to close its own loops.
