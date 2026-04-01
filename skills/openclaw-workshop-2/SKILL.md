@@ -67,9 +67,33 @@ Your agent reacts to every message so you always know what's happening:
 
 ---
 
-### Chapter 2: Secure Access
+### Chapter 2: Execution Approvals (Optional)
 
-**Step 2: 1Password Integration** *(Optional -- skip if you don't use 1Password)*
+**Step 2: Check Exec Approval Mode**
+OpenClaw has a safety feature called "exec approvals" -- it asks you to approve every command before the agent runs it. This is great for learning, but once you trust your agent, it slows everything down.
+
+*How to check:* Look at `~/.openclaw/exec-approvals.json` or check the openclaw settings for execution approval mode.
+
+**If exec approvals are enabled:**
+Explain what they do -- every time the agent wants to run a terminal command, it asks you first. This is safe but tedious, especially for today's exercises where we'll be running lots of commands.
+
+Offer the choice:
+- **Keep them on** -- safer, but you'll be approving a LOT of things today. Good if you want to see exactly what your agent does.
+- **Turn them off** -- the agent runs freely. This is how it works in "employee mode." You trust it to act, and you review the results.
+
+*Prompt to disable:*
+> Disable execution approvals so you can run commands without asking me each time. I trust you.
+
+*Prompt to keep but allow-list:*
+> Keep execution approvals on, but auto-approve safe commands like ls, cat, find, and brew.
+
+**Why this matters:** This is a trust decision. In Workshop 1 we talked about leveling up like an employee. Turning off approvals is like saying "I trust you to do your job without checking in on every little thing." Most people disable them once they're comfortable -- it makes the agent dramatically more useful.
+
+---
+
+### Chapter 3: Secure Access
+
+**Step 3: 1Password Integration** *(Optional -- skip if you don't use 1Password)*
 
 Your agent needs to log into things. The right way: 1Password. Agent fetches credentials on demand, gets 2FA codes automatically, and you approve from your phone. No passwords in text files. Ever.
 
@@ -86,9 +110,9 @@ Your agent needs to log into things. The right way: 1Password. Agent fetches cre
 
 ---
 
-### Chapter 3: Skills Check
+### Chapter 4: Skills Check
 
-**Step 3: Review Installed Skills**
+**Step 4: Review Installed Skills**
 Skills are pre-built instruction manuals that teach your agent new abilities instantly.
 
 *Setup prompt:*
@@ -123,8 +147,9 @@ Or if they want something specific:
 ```
 Part 1 done! Quick recap:
 ✅ Ack emojis -- visual feedback on every message
+✅ Exec approvals -- reviewed and configured to your comfort level
 ✅ 1Password -- secure credential access (or skipped)
-✅ Skills -- reviewed and ready
+✅ Skills -- reviewed, marketplace skill installed
 
 Now the fun part. Let's build real things.
 ```
