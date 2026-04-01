@@ -38,8 +38,8 @@ Let's see where we're at.
 Before we dive in, let's make sure Workshop 1 is solid:
 - OpenClaw installed and running
 - Telegram connected
+- Voice-to-text working
 - Email via IMAP working
-- gog skill configured (Gmail, Calendar, Drive access)
 - Browser functional
 
 If anything is missing, let's fix it first. Everything today builds on this.
@@ -67,9 +67,37 @@ Your agent reacts to every message so you always know what's happening:
 
 ---
 
-### Chapter 2: Execution Approvals (Optional)
+### Chapter 2: Google Workspace (gog skill)
 
-**Step 2: Check Exec Approval Mode**
+**Step 2: Connect Google Workspace**
+This is a big one. The gog skill gives your agent access to Gmail, Google Calendar, Google Drive, Contacts, Sheets, and Docs. Many of today's use cases depend on this -- calendar booking, meeting summaries, file sharing.
+
+To use gog, you need a Google OAuth client. You have two options:
+
+**Option A: Use our pre-configured client (Recommended)**
+We've included a ready-to-go OAuth client in this project. Quick and painless:
+- File: `secrets/gog-credentials.zip`
+- Passphrase: *(shared during the workshop)*
+
+*Setup prompt:*
+> Unzip secrets/gog-credentials.zip (the passphrase is [passphrase]) and use the client_secret.json inside to configure the gog skill for Google Workspace access. Set up Gmail, Calendar, and Drive.
+
+**Option B: Register your own Google OAuth client**
+If you prefer full control over your own Google Cloud project:
+
+*Setup prompt:*
+> Help me create my own Google OAuth client for the gog skill. Walk me through setting up a project in Google Cloud Console, enabling the Gmail, Calendar, and Drive APIs, and creating OAuth credentials. I'm not technical -- guide me through every step.
+
+**For both options -- verification:**
+> List my 3 most recent emails, show tomorrow's calendar events, and list 5 recent files in my Google Drive.
+
+*Close the loop:* All three should work -- email, calendar, and Drive. If any fail, troubleshoot the OAuth scopes. This is the foundation for several use cases today, so take the time to get it right.
+
+---
+
+### Chapter 3: Execution Approvals (Optional)
+
+**Step 3: Check Exec Approval Mode**
 OpenClaw has a safety feature called "exec approvals" -- it asks you to approve every command before the agent runs it. This is great for learning, but once you trust your agent, it slows everything down.
 
 *How to check:* Look at `~/.openclaw/exec-approvals.json` or check the openclaw settings for execution approval mode.
@@ -91,9 +119,9 @@ Offer the choice:
 
 ---
 
-### Chapter 3: Secure Access
+### Chapter 4: Secure Access
 
-**Step 3: 1Password Integration** *(Optional -- skip if you don't use 1Password)*
+**Step 4: 1Password Integration** *(Optional -- skip if you don't use 1Password)*
 
 Your agent needs to log into things. The right way: 1Password. Agent fetches credentials on demand, gets 2FA codes automatically, and you approve from your phone. No passwords in text files. Ever.
 
@@ -110,17 +138,17 @@ Your agent needs to log into things. The right way: 1Password. Agent fetches cre
 
 ---
 
-### Chapter 4: Skills Check
+### Chapter 5: Skills Check
 
-**Step 4: Review Installed Skills**
+**Step 5: Review Installed Skills**
 Skills are pre-built instruction manuals that teach your agent new abilities instantly.
 
 *Setup prompt:*
 > Show me what skills are already installed.
 
 Key skills we'll use today:
-- **gog** -- Gmail, Calendar, Drive (should already be configured)
-- **whisper** -- speech-to-text (should be set up from Workshop 1)
+- **gog** -- Gmail, Calendar, Drive (just configured in Chapter 2)
+- **whisper** -- speech-to-text (set up in Workshop 1)
 - **xurl** -- Twitter/X (we'll set this up in Use Case 4)
 
 **Now let's install a skill from the marketplace.**
@@ -147,7 +175,8 @@ Or if they want something specific:
 ```
 Part 1 done! Quick recap:
 ✅ Ack emojis -- visual feedback on every message
-✅ Exec approvals -- reviewed and configured to your comfort level
+✅ Google Workspace -- Gmail, Calendar, Drive connected via gog
+✅ Exec approvals -- configured to your comfort level
 ✅ 1Password -- secure credential access (or skipped)
 ✅ Skills -- reviewed, marketplace skill installed
 
@@ -390,8 +419,10 @@ Look at what you built today:
 
 Setup:
 ✅ Ack emojis -- you always know what's happening
+✅ Google Workspace -- Gmail, Calendar, Drive via gog
+✅ Exec approvals -- configured your way
 ✅ 1Password -- secure access, no passwords exposed
-✅ Skills system -- extensible and ready
+✅ Skills system -- extensible, marketplace skill installed
 
 Use Cases:
 🎵 Played music via browser automation
