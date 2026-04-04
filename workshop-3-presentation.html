@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Workshop 3: Security, Threads &amp; Multi-Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e8e8ed;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.45);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%; height: 100%;
+            display: none;
+            padding: 70px 100px;
+            position: absolute; top: 0; left: 0;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute; top: 30px; left: 100px; right: 100px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 3.8rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 16px; }
+        h2 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; margin-bottom: 24px; }
+        h3 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 20px 0 12px 0; letter-spacing: -0.01em; }
+
+        .slide-content { margin-top: 100px; flex: 1; }
+
+        p, li { font-size: 1.35rem; line-height: 1.8; color: var(--text-dim); font-weight: 400; }
+        ul { list-style: none; margin: 16px 0; }
+        li { margin: 12px 0; padding-left: 28px; position: relative; }
+        li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .highlight { color: #fff; font-weight: 600; }
+        .bad { color: var(--red); font-weight: 600; }
+        .warn { color: var(--orange); font-weight: 500; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+        .three-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 24px; }
+
+        .column {
+            background: var(--surface); padding: 32px;
+            border-radius: var(--radius); border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .column h3 { margin-top: 0; }
+
+        .quote {
+            font-size: 1.3rem; color: var(--text-dim);
+            border-left: 3px solid var(--accent); padding-left: 24px; margin: 32px 0;
+            font-weight: 400;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.03); padding: 28px; border-radius: var(--radius);
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 1rem;
+            color: var(--text); margin: 20px 0; white-space: pre; overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 1.2rem; }
+        th, td { padding: 20px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            transition: width 0.3s ease; z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed; bottom: 24px; right: 40px;
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.1) 0%, var(--bg) 70%);
+        }
+        .title-slide .subtitle { font-size: 1.6rem; }
+        .title-slide h1 { font-size: 5rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; }
+        .title-slide h1 .grad { background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: var(--text-muted); margin-top: 8px; font-weight: 400; }
+
+        .section-number {
+            font-size: 10rem; font-weight: 900;
+            color: #fff; opacity: 0.03; position: absolute; top: 10px; right: 80px;
+            letter-spacing: -0.05em;
+        }
+
+        .prompt-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius); padding: 20px 24px;
+            margin: 16px 0; font-size: 1.05rem; line-height: 1.6; max-width: 750px;
+            color: var(--text);
+        }
+        .prompt-block::before {
+            content: "Prompt";
+            display: block; font-size: 0.7rem; color: var(--accent);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+        }
+
+        .flow-diagram { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 30px 0; flex-wrap: wrap; }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; text-align: center; min-width: 160px; flex: 1; max-width: 220px;
+            backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .flow-step .step-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .flow-step .step-text { font-size: 0.95rem; color: var(--text-dim); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-muted); display: flex; align-items: center; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+        .stat-label { font-size: 1rem; color: var(--text-muted); margin-top: 8px; }
+
+        .step-sequence { display: flex; gap: 16px; margin: 24px 0; }
+        .step-box {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; text-align: center;
+        }
+        .step-box.active-step {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-color: transparent;
+        }
+        .step-box .step-num { font-size: 2.2rem; font-weight: 800; opacity: 0.15; margin-bottom: 8px; color: #fff; }
+        .step-box.active-step .step-num { opacity: 0.3; }
+        .step-box .step-label { font-size: 1rem; color: var(--text-dim); }
+        .step-box.active-step .step-label { color: #fff; }
+
+        .column-accent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.03));
+            border-color: rgba(99,102,241,0.2);
+        }
+        .column-accent h3 { color: #fff; }
+        .column-accent li { color: var(--text); }
+
+        .column-green {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03));
+            border-color: rgba(34,197,94,0.2);
+        }
+        .column-green h3 { color: var(--green); }
+
+        .column-orange {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.03));
+            border-color: rgba(245,158,11,0.2);
+        }
+        .column-orange h3 { color: var(--orange); }
+
+        .tag {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-red { background: rgba(239,68,68,0.12); color: var(--red); }
+        .tag-accent { background: var(--accent-glow); color: var(--accent); }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        @media (min-width: 1600px) { html { font-size: 18px; } }
+        @media (min-width: 1920px) {
+            html { font-size: 20px; }
+            .slide { padding: 80px 140px; }
+            .slide-title { left: 140px; right: 140px; }
+            .flow-step { min-width: 160px; padding: 24px 28px; }
+            .flow-step .step-icon { font-size: 2.2rem; }
+            .stat-card { padding: 40px; }
+            .stat-number { font-size: 3.2rem; }
+            .column { padding: 40px; }
+            .two-columns { gap: 40px; }
+            .step-sequence { gap: 24px; }
+            .step-box { padding: 32px; }
+            .prompt-block { padding: 28px 32px; max-width: 900px; font-size: 1.15rem; }
+            table { font-size: 1.3rem; }
+            th, td { padding: 24px 32px; }
+        }
+        @media (min-width: 2400px) {
+            html { font-size: 24px; }
+            .slide { padding: 100px 200px; }
+            .slide-title { left: 200px; right: 200px; }
+            h1 { font-size: 4.5rem; }
+            .title-slide h1 { font-size: 6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 1.6rem; }
+            .flow-diagram { gap: 20px; }
+            .flow-step { min-width: 180px; padding: 28px 32px; }
+            .stat-grid { gap: 36px; }
+            .stat-card { padding: 48px; }
+            .stat-number { font-size: 3.6rem; }
+            .column { padding: 48px; }
+            .two-columns { gap: 50px; }
+            .prompt-block { padding: 32px 40px; max-width: 1100px; font-size: 1.25rem; }
+            .quote { font-size: 1.5rem; padding-left: 32px; }
+            .code-block { padding: 36px; font-size: 1.1rem; }
+            table { font-size: 1.4rem; }
+            th, td { padding: 28px 36px; }
+            li { margin: 16px 0; }
+            .progress-bar { height: 3px; }
+        }
+        @media (min-width: 3200px) {
+            html { font-size: 30px; }
+            .slide { padding: 120px 260px; }
+            .slide-title { left: 260px; right: 260px; }
+            .title-slide h1 { font-size: 7rem; }
+            .stat-grid { gap: 48px; }
+            .stat-card { padding: 56px; }
+            .column { padding: 56px; }
+            .progress-bar { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- ==================== TITLE ==================== -->
+        <div class="slide title-slide active">
+            <h1>🦀 <span class="grad">OpenClaw Sprint C1</span></h1>
+            <div class="subtitle">Workshop 3: Security, Threads &amp; Multi-Agent</div>
+            <p style="margin-top: 48px; color: var(--text-muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <!-- ==================== WELCOME BACK ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>👋 Welcome Back</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    Workshop 1: <span class="highlight">built the foundation</span>
+                </p>
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    Workshop 2: <span class="highlight">made it useful</span>
+                </p>
+                <p style="font-size: 2rem; font-weight: 700; margin-bottom: 40px; color: var(--accent);">
+                    Workshop 3: <span style="color: var(--accent); font-weight: 700;">understand the risks, build it right</span>
+                </p>
+                <div style="display: flex; gap: 48px; align-items: center; margin-top: 16px;">
+                    <div>
+                        <ul>
+                            <li>❓ Quick check &mdash; blockers? how did last week go?</li>
+                            <li>📅 <span class="highlight">Monday is demo day</span> &mdash; we want you to succeed</li>
+                            <li>🆘 Book a meeting to unblock &mdash; 30 min is usually enough</li>
+                        </ul>
+                    </div>
+                    <div style="text-align: center; flex-shrink: 0;">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZoAAAGaAQAAAAAefbjOAAADHElEQVR4nO1cQY6jQAy0ASnHRsoD8hT42jxpfgBP2QesBMdIRF7Z7Qai2cOgMEOSrjogkqYELax2udoJC21GX2znEIHkAMkBkgMkB0gOkBwgvRKJHRURjXqgG3M7MnNLNybSM0N7yONtBEg7kBpRDOsR6agU+ahL4VbPFDvcaRtAOow0+gLAXBNxO56EKFzjQiFdXEaq4x5vE0DaldQMmibCVXNFRdKF6afu9B2A9ASkMJF0Y0XcBtGEoUvGz9zpGwDp10kU9UETdUQpHhEqHLr5TAdW13VPPqcCpMcjwlEKNcP/DukCRMTbkyo7yvJFf1EJYVAx0V9URwR5pTkVIO2QNQb7oLnCvhtS1rCKdBk1YI3IRUd0WlfEM80fPuph4aGCiMgla4zniWg8CesZq2dJFHRpGM9CfVtO3Az17z9eAdJRyjJ4RnDjMpjanNPEasnAGpEFSWIcjOxSsvlTaf6YklNphlWMkiMebyNA2oHUq3fNVlcYwpXlg82zvLKVoCKD7n49fKdtAOkgHUE0VpP4tmcp3Nd/iVVHMIVSYjXadHOV+uRzKkB6WEeIFhIxL3itcT8Qy1JUnzmQaNGOsrgQfjCjwp1tCxV4lhm52GVaAMyXumuXWPwIRMT7k2iVHBrbw1BLav6YFgo3LpE13p9Ey3og6k/GDDGniaQevAhBRORC4tgLMZ48NrQ/wg6+3VW7mED1mZdn2cV+KU8dK0vKEkbMH1gjMtr7lNgxEyNirTFTgCTJiYh4ZxKt3nmTztJ6MMuKu4sREblEhHh9OYvKKC9TRKwGnnxOBUgPu9jiuYKI+3qItjX7YCmsBrZuk2OnK8PfdIkZ2B+sv9IwZan7ofPvvA56vI0AafdebHL1kKwIExgryfnkcypA2qfWoLiHkXa1VnEQgVojC1L15ZswkHbQsXXaydxfx7OiePo5FSDtGhF0q6S/TBWbSdl8noWbT46tEeiPyCcigr7s0Xpwtf02+NvX2NAOq1K7ccvpNeZUgLSDix2xGNhuU623xK1PHzri3UmMfyaLAMkBkgMkB0gOkBwgOUCiiH+v0J0tXKL3igAAAABJRU5ErkJggg==" alt="Book a meeting" style="width: 180px; height: 180px; border-radius: 12px; background: #fff; padding: 8px;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;"><a href="https://calendar.app.google/bGVMqZonj6oHoJ2y9">calendar.app.google/bGVMqZonj6oHoJ2y9</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TODAY'S PLAN ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>📋 Today's Plan</h2></div>
+            <div class="slide-content">
+                <div class="step-sequence">
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span style="color: var(--red); font-weight: 700;">🔐 Security</span><br><span style="font-size: 0.85rem;">Prompt injection, exfiltration, why prompts fail</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">🏗️ Conversations</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">5 levels: chat &rarr; subagents &rarr; threads &rarr; multi-agent &rarr; dedicated</span></div>
+                    </div>
+                    <div class="step-box" style="border-color: rgba(245,158,11,0.3);">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span style="color: var(--orange); font-weight: 700;">💰 Costs</span><br><span style="font-size: 0.85rem;">Subscriptions, cheap models, credits</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: SECURITY ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔐 <span class="grad">Security: The Real Risks</span></h1>
+            <div class="subtitle">Your agent follows instructions. Whose instructions?</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Prompt Injection</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: var(--text);">
+                    Someone hides instructions in data your agent reads.<br>
+                    <span class="bad">The agent follows them.</span>
+                </p>
+                <div class="flow-diagram">
+                    <div class="flow-step" style="border-color: rgba(239,68,68,0.3);"><div class="step-icon">📧</div><div class="step-text"><strong style="color:var(--red);">Malicious email</strong><br>hidden instructions</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text">Agent reads<br>email content</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">⚡</div><div class="step-text">Follows hidden<br>instructions</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="border-color: rgba(239,68,68,0.3);"><div class="step-icon">💀</div><div class="step-text"><strong style="color:var(--red);">Data leaked</strong><br>to attacker</div></div>
+                </div>
+                <div class="quote" style="margin-top: 16px;">Anyone who can put text in front of your agent &mdash; email, web pages, documents &mdash; can potentially control it.</div>
+                <a href="https://www.youtube.com/watch?v=jrHRe9lSqqA" target="_blank" style="display: inline-block; margin-top: 12px; position: relative;"><img src="https://img.youtube.com/vi/jrHRe9lSqqA/hqdefault.jpg" alt="IBM: What is Prompt Injection?" style="width: 420px; border-radius: 12px; border: 1px solid var(--border); display: block;"><span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff;">▶</span></a>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Data Exfiltration: The Attack Chain</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="bad">Inject</span><br><span style="font-size: 0.85rem;">Hidden instructions in email, web page, or doc</span></div>
+                    </div>
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="bad">Read</span><br><span style="font-size: 0.85rem;">Agent reads sensitive files, emails, credentials</span></div>
+                    </div>
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="bad">Exfiltrate</span><br><span style="font-size: 0.85rem;">Sends data to external endpoint</span></div>
+                    </div>
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span class="bad">Cover</span><br><span style="font-size: 0.85rem;">Doesn't mention what it did</span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.3rem; color: var(--text);">
+                    Your agent has <span class="highlight">email + browser + filesystem + calendar</span>.<br>
+                    If injection succeeds, the attacker gets <span class="bad">all of it</span>.
+                </p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Prompt Injection via Email</div>
+        </div>
+
+        <!-- ==================== WHY SYSTEM PROMPTS FAIL ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Why System Prompts Aren't Enough</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: var(--text);">
+                    &ldquo;Just tell it to never follow external instructions&rdquo;<br>
+                    <span class="bad">Doesn't reliably work.</span> Here's why:
+                </p>
+                <div class="three-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">📏 Conversation Length</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">The longer the conversation, the <span class="bad">weaker</span> the system prompt's influence. After 50 messages, rules fade.</p>
+                    </div>
+                    <div class="column" style="border-color: rgba(245,158,11,0.2);">
+                        <h3 style="color: var(--orange);">📐 Rule Strictness</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">Strict rules work better than vague ones. But even <span class="warn">strict rules can be bypassed</span> with creative framing.</p>
+                    </div>
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">🎭 Hacker Creativity</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim);">They don't say &ldquo;ignore rules.&rdquo; They say &ldquo;the user updated their preferences&rdquo; or use <span class="bad">other languages</span>.</p>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 24px;">In traditional security, rules are absolute. In AI security, rules are <span class="highlight">guidelines</span> &mdash; followed most of the time, not all the time.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 The Context Overload Problem</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 32px; color: #fff;">
+                    More tools = more confusion = <span class="bad">more risk</span>
+                </p>
+                <div class="two-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">🛠️ God-Mode Agent</h3>
+                        <ul>
+                            <li>Email + Calendar + Browser + Files + Social + Finance</li>
+                            <li>Huge <span class="bad">context window</span></li>
+                            <li>Easily <span class="bad">confused</span> by injections</li>
+                            <li>One breach = <span class="bad">everything exposed</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>🎯 Focused Agent</h3>
+                        <ul>
+                            <li>One job, one set of tools</li>
+                            <li>Small, <span class="highlight">clear context</span></li>
+                            <li>Harder to <span class="highlight">trick</span></li>
+                            <li>One breach = <span class="highlight">limited damage</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.3rem; color: var(--accent); font-weight: 600;">
+                    The more trust and features you load into one agent, the more fragile it becomes.
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== OPENCLAW SECURITY ARCHITECTURE ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 OpenClaw's Security Layers</h2></div>
+            <div class="slide-content">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;">OpenClaw has real security mechanisms. They help, but <span class="highlight">they have limits</span>.</p>
+                <table>
+                    <tr><th>Layer</th><th>What it does</th><th>Limit</th></tr>
+                    <tr><td><span class="highlight">🚦 Exec Approvals</span></td><td>Hard gate on terminal commands</td><td>Only covers CLI, not email/browser/files</td></tr>
+                    <tr><td><span class="highlight">🏷️ UNTRUSTED Labels</span></td><td>Marks web-fetched content as external</td><td><span class="bad">Advisory only</span> &mdash; agent rationalizes past it</td></tr>
+                    <tr><td><span class="highlight">📜 SOUL.md / AGENTS.md</span></td><td>Defines boundaries and rules</td><td>System prompt &mdash; fades with conversation length</td></tr>
+                    <tr><td><span class="highlight">🔒 Session Isolation</span></td><td>Separate contexts per chat/channel</td><td>No isolation <em>within</em> a session</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Real Test: UNTRUSTED Labels Failed</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;">We tested this with a <span class="highlight">real attack</span>. Here's what happened:</p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">🔗</div><div class="step-text">Gist URL with<br>hidden instructions</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="border-color: rgba(34,197,94,0.3);"><div class="step-icon">🏷️</div><div class="step-text"><strong style="color:var(--green);">UNTRUSTED</strong><br>label applied ✅</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="border-color: rgba(239,68,68,0.3);"><div class="step-icon">🧠</div><div class="step-text"><strong style="color:var(--red);">Agent rationalized</strong><br>&ldquo;seems benign&rdquo;</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="border-color: rgba(239,68,68,0.3);"><div class="step-icon">💀</div><div class="step-text"><strong style="color:var(--red);">Executed</strong><br>instructions anyway</div></div>
+                </div>
+                <div class="two-columns" style="margin-top: 16px;">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">Why it failed</h3>
+                        <ul>
+                            <li><span class="bad">Warning fatigue</span> &mdash; sees it on all web content</li>
+                            <li><span class="bad">Rationalization</span> &mdash; &ldquo;probably from the owner&rdquo;</li>
+                            <li><span class="bad">Content bias</span> &mdash; request seemed harmless</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>The lesson</h3>
+                        <ul>
+                            <li>Warnings without enforcement = <span class="highlight">suggestions</span></li>
+                            <li>Don't rely on the agent to say no</li>
+                            <li><span class="highlight">Remove its ability to say yes</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: MITIGATION ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🛡️ <span class="grad">The Mitigation Strategy</span></h1>
+            <div class="subtitle">You can't make it perfect. You can make the blast radius small.</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🛡️ What Actually Works</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column column-green">
+                        <h3>✅ Works (somewhat)</h3>
+                        <ul>
+                            <li>Use the <span class="highlight">best models</span> &mdash; better at detecting injection</li>
+                            <li><span class="highlight">Least privilege</span> &mdash; minimum access per agent</li>
+                            <li><span class="highlight">Short conversations</span> &mdash; restart often</li>
+                            <li><span class="highlight">Specific rules</span> &mdash; &ldquo;never email addresses outside this list&rdquo;</li>
+                            <li><span class="highlight">Split responsibilities</span> &mdash; one agent, one job</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">❌ Doesn't work</h3>
+                        <ul>
+                            <li>&ldquo;Never follow external instructions&rdquo;</li>
+                            <li>Adding more and more rules <span class="bad">(they dilute each other)</span></li>
+                            <li>Treating system prompts as a <span class="bad">security boundary</span></li>
+                            <li>One agent doing <span class="bad">everything</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🛡️ The Least Privilege Principle</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 32px; color: #fff;">
+                    The single most effective security measure for AI agents.
+                </p>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔧</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Fewer tools</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Less context to manage = harder to confuse</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔒</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Less access</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Less damage when something goes wrong</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🎯</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">One job</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">More focused = more reliable</p>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 16px;">List all the tools and access you currently have. Now imagine a prompt injection succeeds &mdash; what's the worst-case scenario? What could an attacker do?</div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Access Audit &amp; Blast Radius Analysis</div>
+        </div>
+
+        <!-- ==================== SECTION: ORGANIZING CONVERSATIONS ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🏗️ <span class="grad">Organizing Conversations</span></h1>
+            <div class="subtitle">Five levels &mdash; from single chat to dedicated hardware</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🏗️ The Five Levels</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="highlight">Single Chat</span><br><span style="font-size: 0.8rem;">One conversation</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">Subagents</span><br><span style="font-size: 0.8rem;">Background tasks</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">Threads &amp; Groups</span><br><span style="font-size: 0.8rem;">Platform-level</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color:#fff; font-weight: 700;">Multiple Agents</span><br><span style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Separate brains</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">5</div>
+                        <div class="step-label"><span class="highlight">Dedicated Instances</span><br><span style="font-size: 0.8rem;">OS / hardware</span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.2rem; color: var(--text-dim); text-align: center;">Each level adds <span class="highlight">isolation</span> and <span class="warn">complexity</span>. Pick the right one for your use case.</p>
+            </div>
+        </div>
+
+        <!-- Level 1 & 2 -->
+        <div class="slide">
+            <div class="slide-title"><h2>💬 Level 1: Single Chat &nbsp;&nbsp;|&nbsp;&nbsp; ⚡ Level 2: Subagents</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>💬 Single Chat</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Where everyone starts. One DM, one session.</p>
+                        <ul>
+                            <li>Simple, <span class="highlight">no setup</span></li>
+                            <li>Full context in one conversation</li>
+                            <li><span class="bad">Zero isolation</span></li>
+                        </ul>
+                        <p style="font-size: 0.9rem; color: var(--orange); margin-top: 12px;">⚠️ Default: all DMs share one session. Fix with <span class="highlight">session.dmScope</span></p>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>⚡ Subagents</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Background tasks with own sessions.</p>
+                        <ul>
+                            <li>Spawned via <span class="highlight">/subagents spawn</span></li>
+                            <li>Own session, own token budget</li>
+                            <li><span class="highlight">Announces</span> results back when done</li>
+                            <li>Can nest: sub-subagents</li>
+                        </ul>
+                        <div class="prompt-block" style="margin-top: 12px; font-size: 0.9rem;">Spawn a subagent to research top 5 AI news stories this week. Announce results when done.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level 3 -->
+        <div class="slide">
+            <div class="slide-title"><h2>🧵 Level 3: Threads, Topics &amp; Groups</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;">Platform-level separation. Each gets its own <span class="highlight">isolated session</span>.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>🧵 Threads/Topics</h3>
+                        <ul>
+                            <li>Telegram <span class="highlight">forum topics</span></li>
+                            <li>Discord threads</li>
+                            <li>Slack threads</li>
+                            <li>Each = own session key</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>👥 Groups</h3>
+                        <ul>
+                            <li>Isolated per group automatically</li>
+                            <li><span class="highlight">groupPolicy: allowlist</span></li>
+                            <li>Mention gating (require @)</li>
+                            <li>Tool restrictions per group</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">⚠️ Limitation</h3>
+                        <ul>
+                            <li>Same agent, same <span class="bad">permissions</span></li>
+                            <li>Injection in any thread = <span class="bad">full access</span></li>
+                            <li>Context isolation, <span class="bad">not security</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=gZ6Ay-ow0BQ" target="_blank" style="display: inline-block; margin-top: 12px; position: relative;"><img src="https://img.youtube.com/vi/gZ6Ay-ow0BQ/hqdefault.jpg" alt="Telegram Groups Setup" style="width: 280px; border-radius: 10px; border: 1px solid var(--border); display: block;"><span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff;">▶</span></a>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Subagents &amp; Threads</div>
+        </div>
+
+        <!-- Level 4 -->
+        <div class="slide">
+            <div class="slide-title"><h2>🤝 Level 4: Multiple Agents</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; font-weight: 600; margin-bottom: 24px; color: #fff;">Separate brains within one Gateway. Built into the CLI.</p>
+                <div class="code-block" style="font-size: 0.95rem; padding: 16px 24px; margin-bottom: 16px;">openclaw agents add research
+openclaw agents add email-handler
+openclaw agents list --bindings</div>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🔧 Per-agent tool isolation</h3>
+                        <table style="font-size: 0.95rem;">
+                            <tr><th>Agent</th><th>Allow</th><th>Deny</th></tr>
+                            <tr><td>🔍 Research</td><td>browser, web_fetch</td><td><span class="bad">email, exec</span></td></tr>
+                            <tr><td>📧 Email</td><td>email, gog</td><td><span class="bad">browser, exec</span></td></tr>
+                        </table>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Each agent gets:</h3>
+                        <ul>
+                            <li>Own <span class="highlight">workspace</span> &amp; personality</li>
+                            <li>Own <span class="highlight">credentials</span> (never shared)</li>
+                            <li>Own <span class="highlight">sessions</span> &amp; chat history</li>
+                            <li><span class="highlight">Routing</span> via bindings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🤝 Real Example: Claire Vo's 9 Agents</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;">&ldquo;Multi-agent was the unlock. With a narrower identity, the bots did a <span class="highlight">better job</span>.&rdquo;</p>
+                <table style="font-size: 1.05rem;">
+                    <tr><th>Agent</th><th>Role</th><th>Key tools</th></tr>
+                    <tr><td><span class="highlight">Polly</span></td><td>Personal assistant</td><td>Email, calendar, Linear</td></tr>
+                    <tr><td><span class="highlight">Finn</span></td><td>Family manager</td><td>Calendar, school schedules</td></tr>
+                    <tr><td><span class="highlight">Max</span></td><td>Marketer</td><td>X API, Buffer, website</td></tr>
+                    <tr><td><span class="highlight">Sam</span></td><td>Sales</td><td>CRM, email, calendar</td></tr>
+                    <tr><td><span class="highlight">Holly</span></td><td>Helpdesk</td><td>Support email, Intercom</td></tr>
+                    <tr><td><span class="highlight">Kelly</span></td><td>Developer</td><td>GitHub, Claude Code</td></tr>
+                </table>
+                <div style="margin-top: 12px; display: flex; align-items: center; gap: 24px;"><a href="https://www.youtube.com/watch?v=DIa0MYJzM5I" target="_blank" style="display: inline-block; position: relative; flex-shrink: 0;"><img src="https://img.youtube.com/vi/DIa0MYJzM5I/hqdefault.jpg" alt="Claire Vo on Lenny's Podcast" style="width: 360px; border-radius: 12px; border: 1px solid var(--border); display: block;"><span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff;">▶</span></a><p style="font-size: 1rem; color: var(--text-muted);">📝 <a href="https://www.lennysnewsletter.com/p/how-openclaw-changed-my-life-claire-vo">Written guide on Lenny's Newsletter</a></p></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🤝 Why Multi-Agent Works</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">❌ One agent, everything</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Prompt injection in a web page:</p>
+                        <ul>
+                            <li>Reads your <span class="bad">email</span></li>
+                            <li>Accesses your <span class="bad">files</span></li>
+                            <li>Uses your <span class="bad">credentials</span></li>
+                            <li>Sends data <span class="bad">externally</span></li>
+                        </ul>
+                        <p style="font-size: 1rem; color: var(--red); margin-top: 16px; font-weight: 600;">Blast radius: EVERYTHING</p>
+                    </div>
+                    <div class="column column-green">
+                        <h3>✅ Separate research agent</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Same injection, but tools.deny blocks:</p>
+                        <ul>
+                            <li>❌ Can't read email</li>
+                            <li>❌ Can't access files</li>
+                            <li>❌ Can't use credentials</li>
+                            <li>❌ Can't send email</li>
+                        </ul>
+                        <p style="font-size: 1rem; color: var(--green); margin-top: 16px; font-weight: 600;">Blast radius: web browsing only</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level 5 -->
+        <div class="slide">
+            <div class="slide-title"><h2>🏢 Level 5: Dedicated Instances</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 24px; color: #fff;">Maximum isolation. Separate installs, users, or machines.</p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>When you need this</h3>
+                        <ul>
+                            <li>Multi-person teams</li>
+                            <li><span class="highlight">Compliance</span> requirements</li>
+                            <li>High-security environments</li>
+                            <li>Dedicated hardware (Raspberry Pi, server)</li>
+                        </ul>
+                    </div>
+                    <div class="column column-orange">
+                        <h3>The tradeoff</h3>
+                        <ul>
+                            <li>Separate OS user per agent</li>
+                            <li>Separate OpenClaw install</li>
+                            <li>Separate API keys &amp; config</li>
+                            <li><span class="warn">Maximum maintenance</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 16px;">Only do this when Level 4 isn't enough. OS-level isolation means agents literally cannot read each other's files.</div>
+            </div>
+        </div>
+
+        <!-- Choosing -->
+        <div class="slide">
+            <div class="slide-title"><h2>🎯 Choosing Your Level</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <table>
+                    <tr><th>Level</th><th>Isolation</th><th>Setup</th><th>Use when</th></tr>
+                    <tr><td><span class="highlight">1. Single chat</span></td><td>None</td><td>Zero</td><td>Just you, simple tasks</td></tr>
+                    <tr><td><span class="highlight">2. Subagents</span></td><td>Session</td><td>Minimal</td><td>Parallel background tasks</td></tr>
+                    <tr><td><span class="highlight">3. Threads/Groups</span></td><td>Session per thread</td><td>Platform config</td><td>Multiple conversations, teams</td></tr>
+                    <tr><td><span class="highlight">4. Multiple agents</span></td><td>Full (workspace, creds)</td><td>CLI + config</td><td><span class="highlight">Security isolation</span></td></tr>
+                    <tr><td><span class="highlight">5. Dedicated instances</span></td><td>OS-level</td><td>Full install</td><td>Compliance, multi-person</td></tr>
+                </table>
+                <p style="margin-top: 16px; font-size: 1.2rem; color: var(--accent); font-weight: 600;">Most people: Levels 1-3. Security-conscious: Level 4. Enterprise: Level 5.</p>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🔴 <span class="grad">LIVE DEMO</span></h1>
+            <div class="subtitle">Setting Up a Dedicated Agent</div>
+        </div>
+
+        <!-- ==================== PUTTING IT TOGETHER ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🏗️ The Full Picture</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 70%;">
+                <p style="font-size: 1.5rem; margin-bottom: 32px; color: var(--text-dim);">From <span class="bad">god-mode agent</span> to <span class="highlight">secure architecture</span>:</p>
+                <div class="stat-grid" style="width: 100%; max-width: 900px;">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔐</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Know the risks</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Injection &amp; exfiltration</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🛡️</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Least privilege</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Minimum access per agent</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">⚡</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Subagents</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Background parallel tasks</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🧵</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Threads &amp; Groups</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Platform-level isolation</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🤝</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Multiple agents</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Real security isolation</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">💰</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Smart costs</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Right model for the job</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: COST MANAGEMENT ==================== -->
+
+        <div class="slide title-slide">
+            <h1>💰 <span class="grad">Cost Management</span></h1>
+            <div class="subtitle">Running AI agents costs real money</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💰 Three Ways to Pay</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>📱 Claude Subscription</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Simplest option</p>
+                        <ul>
+                            <li>Pro: <span class="highlight">$20/mo</span> (light use)</li>
+                            <li>Max: <span class="highlight">$200/mo</span> (recommended)</li>
+                        </ul>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 12px;">Max gives enough headroom for daily use with Opus</p>
+                    </div>
+                    <div class="column column-green">
+                        <h3>🧠 Cheaper Models</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">For simple tasks</p>
+                        <ul>
+                            <li><span class="highlight">Kimi 2.5</span> &mdash; cheap, fast</li>
+                            <li>Good for cron jobs, drafts</li>
+                            <li>Use <span class="highlight">/models</span> to switch</li>
+                        </ul>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 12px;">Not as advanced, but fine for routine work</p>
+                    </div>
+                    <div class="column column-orange">
+                        <h3>🎟️ Startup Credits</h3>
+                        <p style="font-size: 1rem; color: var(--text-dim); margin-bottom: 16px;">Free money you might already have</p>
+                        <ul>
+                            <li>Anthropic, OpenAI, Google</li>
+                            <li>AWS Bedrock credits</li>
+                            <li>Ask your team!</li>
+                        </ul>
+                        <p style="font-size: 0.9rem; color: var(--orange); margin-top: 12px;">Some teams have $1000s sitting unused</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💰 Smart Model Routing</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Use <span class="highlight">/models</span> in Telegram &mdash; expensive for hard tasks, cheap for routine</p>
+                <table>
+                    <tr><th>Task</th><th>Model</th><th>Why</th></tr>
+                    <tr><td>News briefing, inbox scan, formatting</td><td><span class="highlight">Kimi 2.5 / Haiku</span></td><td>Cheap, fast, good enough</td></tr>
+                    <tr><td>Email drafts, research, scheduling</td><td><span class="highlight">Sonnet / GPT-4o</span></td><td>Balanced</td></tr>
+                    <tr><td>Complex analysis, security-sensitive</td><td><span class="highlight">Opus / Claude Max</span></td><td>Best judgment, worth the cost</td></tr>
+                </table>
+                <div class="quote" style="margin-top: 24px;">Don't use Opus to check the weather. Don't use Kimi for security decisions. Match the model to the task.</div>
+            </div>
+        </div>
+
+        <!-- ==================== HOMEWORK ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>📝 Before Demo Day (Monday)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>🔐 Run the <span class="highlight">prompt injection test</span> on your agent</li>
+                    <li>🔍 Do an <span class="highlight">access audit</span> &mdash; know what your agent can see</li>
+                    <li>⚡ Try <span class="highlight">subagents</span> for background tasks</li>
+                    <li>🧵 Use <span class="highlight">threads</span> for parallel conversations</li>
+                    <li>🤝 Plan (or create) a <span class="highlight">second dedicated agent</span></li>
+                    <li>🎯 Prepare your <span class="highlight">demo</span> &mdash; show what your agent can do!</li>
+                </ul>
+                <div class="quote" style="margin-top: 32px;">Workshop 1: foundation. Workshop 2: useful. Workshop 3: secure &amp; scalable. Monday: show the world.</div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>❓ <span class="grad">Questions?</span></h1>
+            <div class="subtitle">Q&amp;A</div>
+            <div style="margin-top: 60px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">WhatsApp group for follow-ups</p>
+                <p style="font-size: 1.1rem; color: var(--accent); margin-top: 16px;">Book a meeting to unblock &mdash; we're here to help</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
