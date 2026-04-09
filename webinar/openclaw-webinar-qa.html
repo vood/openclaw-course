@@ -276,6 +276,38 @@
             font-family: 'Fraunces', serif;
         }
 
+        .definition-sentence {
+            font-family: 'Fraunces', serif;
+            font-size: 2.35rem;
+            line-height: 1.35;
+            color: var(--ink);
+            max-width: 1050px;
+        }
+
+        .definition-part {
+            display: inline;
+            padding: 0 8px 4px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+
+        .part-accent {
+            background: rgba(15, 118, 110, 0.14);
+            color: var(--accent-strong);
+        }
+
+        .part-warm {
+            background: rgba(141, 77, 21, 0.12);
+            color: var(--warm);
+        }
+
+        .part-ink {
+            background: rgba(23, 19, 17, 0.08);
+            color: var(--ink);
+        }
+
         .flow-diagram {
             display: flex;
             align-items: stretch;
@@ -718,62 +750,45 @@
         <div class="slide">
             <div class="slide-title"><h2>What is OpenClaw?</h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:72%;">
-                <p style="font-size: 2.45rem; line-height: 1.2; color: var(--ink); max-width: 980px;">
-                    <span class="accent">An AI system with its own files, external systems, and recurring tasks.</span><br>
-                    It can keep working after the chat ends.
+                <p class="definition-sentence">
+                    OpenClaw is a <span class="definition-part part-accent">hackable framework</span>
+                    for building <span class="definition-part part-ink">AI agents with their own personality</span>,
+                    that talk through <span class="definition-part part-warm">Telegram, WhatsApp, and Slack</span>,
+                    have <span class="definition-part part-accent">direct access to your computer and files</span>,
+                    and <span class="definition-part part-ink">can modify themselves as they work</span>.
                 </p>
-                <div class="two-columns">
-                    <div class="column">
-                        <span class="badge badge-simple">Simple AI tools</span>
-                        <h3>What they do</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
-                        </div>
-                        <ul>
-                            <li>You ask</li>
-                            <li>They answer</li>
-                            <li>The job ends in chat</li>
-                        </ul>
-                    </div>
-                    <div class="column column-accent">
-                        <span class="badge badge-openclaw">OpenClaw</span>
-                        <h3>What makes it different</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
-                        </div>
-                        <ul>
-                            <li>Gets a workspace</li>
-                            <li>Connects to external systems</li>
-                            <li>Can keep running</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="quote">The big difference is persistence.</div>
+                <div class="quote">Let's unpack it.</div>
             </div>
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Where memory lives</h2></div>
+            <div class="slide-title"><h2>Hackable framework</h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
-                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If you want a real system, the context has to live <span class="highlight">outside the chat box</span>.</p>
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">OpenClaw is not just a product you use. It is a framework people build on.</p>
+                <div class="stat-grid" style="width: 100%; max-width: 900px; align-self: center;">
+                    <div class="stat-card">
+                        <div class="stat-number">330k+</div>
+                        <div class="stat-label">GitHub stars</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">64k+</div>
+                        <div class="stat-label">GitHub forks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2,857+</div>
+                        <div class="stat-label">Plugins on ClawHub</div>
+                    </div>
+                </div>
+                <img src="https://api.star-history.com/svg?repos=openclaw/openclaw&type=Date" alt="OpenClaw GitHub stars chart" style="margin-top: 24px; max-width: min(860px, 100%); width: 100%; border-radius: var(--radius); border: 1px solid rgba(23, 19, 17, 0.12); box-shadow: var(--shadow);">
+                <div class="quote">If you want to change it, add to it, or shape it, that is the point.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Agents with their own personality</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <div class="two-columns">
                     <div class="column column-accent">
-                        <h3>Real context</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://drive.google.com" alt="">Drive</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Docs</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Email</span>
-                        </div>
-                        <ul>
-                            <li>Most of your life is in files</li>
-                            <li>Notes, docs, folders, email</li>
-                            <li>Hard to keep uploading everything</li>
-                        </ul>
-                    </div>
-                    <div class="column">
                         <h3>Identity</h3>
                         <div class="tool-row">
                             <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
@@ -782,19 +797,128 @@
                         </div>
                         <ul>
                             <li>Name, tone, rules</li>
-                            <li>Personality carries across time</li>
-                            <li>People like building their own bot</li>
+                            <li>How it speaks</li>
+                            <li>How it behaves</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Why people care</h3>
+                        <ul>
+                            <li>It feels like your bot</li>
+                            <li>It carries across time</li>
+                            <li>It is more than a generic assistant</li>
                         </ul>
                     </div>
                 </div>
-                <div class="quote">Chat tools see what you paste. Systems remember what you keep.</div>
+                <div class="quote">People do not only want capability. They want a bot that feels like theirs.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Telegram, WhatsApp, and Slack</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">OpenClaw lives in the channels where you already talk.</p>
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="step-icon">💬</div>
+                        <div class="step-text">Telegram<br>WhatsApp<br>Slack</div>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(180deg, rgba(141, 77, 21, 0.08), rgba(255, 250, 244, 0.96));">
+                        <div class="step-icon">⚡</div>
+                        <div class="step-text">OpenClaw<br>receives the message</div>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step">
+                        <div class="step-icon">💻</div>
+                        <div class="step-text">Your computer<br>does the work</div>
+                    </div>
+                </div>
+                <div class="tool-row" style="justify-content: center;">
+                    <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://telegram.org" alt="">Telegram</span>
+                    <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.whatsapp.com" alt="">WhatsApp</span>
+                    <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://slack.com" alt="">Slack</span>
+                </div>
+                <div class="quote">You do not open a special app. You talk to it where you already talk.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Direct access to your computer and files</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If you want a real system, the context has to live outside the chat box.</p>
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>Where your real context lives</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://drive.google.com" alt="">Drive</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Docs</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Email</span>
+                        </div>
+                        <ul>
+                            <li>Most of your life is already in files</li>
+                            <li>Folders, notes, docs, email</li>
+                            <li>Uploading everything does not scale</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm" style="text-align:center;">
+                        <h3>Your computer</h3>
+                        <div style="font-size: 3.8rem; line-height: 1; margin: 10px 0 18px;">💻</div>
+                        <ul style="text-align:left;">
+                            <li>Desktop</li>
+                            <li>Downloads</li>
+                            <li>Local folders</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>What direct access means</h3>
+                        <ul>
+                            <li>It can read and write local files</li>
+                            <li>It can connect to external systems</li>
+                            <li>This is why boundaries matter</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">Chat tools only see what you paste. OpenClaw can work with what is already there.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Can modify themselves as they work</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If a workflow is missing a piece, OpenClaw can add it.</p>
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="step-icon">🎙️</div>
+                        <div class="step-text">Voice note<br>arrives</div>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step">
+                        <div class="step-icon">🤔</div>
+                        <div class="step-text">Finds the missing piece</div>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step">
+                        <div class="step-icon">🛠️</div>
+                        <div class="step-text">Installs Whisper</div>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step">
+                        <div class="step-icon">✅</div>
+                        <div class="step-text">Workflow keeps going</div>
+                    </div>
+                </div>
+                <div class="prompt-block">
+                    <p>Add Whisper voice-to-text so I can send voice messages and have them transcribed automatically.</p>
+                </div>
+                <div class="quote">This is what highly agentic and self-modifying looks like in practice.</div>
             </div>
         </div>
 
         <div class="slide">
             <div class="slide-title"><h2>Five levels of autonomy</h2></div>
             <div class="slide-content">
-                <p style="max-width: 980px;">The key difference is the role you keep.</p>
+                <p style="max-width: 980px;">The difference is how much control you keep.</p>
                 <div class="scale-grid">
                     <div class="scale-card scale-simple">
                         <div class="stage-icon" aria-hidden="true">
@@ -918,58 +1042,19 @@
                         </ul>
                     </div>
                 </div>
-                <div class="quote">Start at the easiest level. Move up only when the workflow forces it.</div>
+                <div class="quote">Start with the easiest option. Move up only when you need more.</div>
             </div>
         </div>
 
-        <div class="slide">
-            <div class="slide-title"><h2>You probably do not need OpenClaw if...</h2></div>
-            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
-                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If the work <span class="highlight">ends with the chat</span>, do not build an agent.</p>
-                <div class="three-columns">
-                    <div class="column">
-                        <h3>Use simple AI for</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
-                        </div>
-                        <ul>
-                            <li>Explain</li>
-                            <li>Summarize</li>
-                            <li>Draft</li>
-                        </ul>
-                    </div>
-                    <div class="column">
-                        <h3>Still simple AI</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://notebooklm.google" alt="">NotebookLM</span>
-                        </div>
-                        <ul>
-                            <li>One email</li>
-                            <li>One plan</li>
-                            <li>One research pass</li>
-                        </ul>
-                    </div>
-                    <div class="column column-warm">
-                        <h3>Why</h3>
-                        <ul>
-                            <li>Less setup</li>
-                            <li>Less cost</li>
-                            <li>Less risk</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="callout">
-                    <p><strong>Boundary:</strong> no files, no external systems, no schedule, usually no OpenClaw.</p>
-                </div>
-            </div>
+        <div class="slide title-slide">
+            <div class="eyebrow">Use Cases</div>
+            <h1>What This Looks Like In Real Life</h1>
+            <div class="subtitle">Personal assistant, self modification, customer support, and software development.</div>
         </div>
 
         <div class="slide">
             <div class="section-number">01</div>
-            <div class="slide-title"><h2>Everyday personal workflows</h2></div>
+            <div class="slide-title"><h2>Personal Assistant</h2></div>
             <div class="slide-content">
                 <div class="three-columns">
                     <div class="column column-accent">
@@ -986,7 +1071,7 @@
                         </ul>
                     </div>
                     <div class="column">
-                        <h3>Planning</h3>
+                        <h3>Daily life</h3>
                         <div class="tool-row">
                             <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://calendar.google.com" alt="">Calendar</span>
                             <span class="tool-chip"><span class="tool-mark mark-notes">NT</span>Notes</span>
@@ -999,7 +1084,7 @@
                         </ul>
                     </div>
                     <div class="column column-warm">
-                        <h3>Use it when</h3>
+                        <h3>Why it works</h3>
                         <ul>
                             <li>It repeats</li>
                             <li>It spans apps</li>
@@ -1015,88 +1100,115 @@
 
         <div class="slide">
             <div class="section-number">02</div>
-            <div class="slide-title"><h2>Work tasks and business workflows</h2></div>
+            <div class="slide-title"><h2>Self Modification</h2></div>
             <div class="slide-content">
                 <div class="two-columns">
                     <div class="column">
-                        <h3>Sales and content</h3>
+                        <h3>Before</h3>
                         <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.linkedin.com" alt="">LinkedIn</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.hubspot.com" alt="">HubSpot</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Google Docs</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://telegram.org" alt="">Telegram</span>
                         </div>
                         <ul>
-                            <li>Lead research</li>
-                            <li>Outreach drafts</li>
-                            <li>Content pipeline</li>
+                            <li>Text only</li>
+                            <li>Voice notes get stuck</li>
+                            <li>You fill the gap manually</li>
                         </ul>
                     </div>
                     <div class="column column-accent">
-                        <h3>Finance and admin</h3>
+                        <h3>After adding Whisper</h3>
                         <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Gmail</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/spreadsheets/" alt="">Sheets</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://stripe.com" alt="">Stripe</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://telegram.org" alt="">Telegram</span>
+                            <span class="tool-chip"><span class="tool-mark mark-openclaw">WH</span>Whisper</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
                         </div>
                         <ul>
-                            <li>Invoice triage</li>
-                            <li>Weekly reports</li>
-                            <li>Contract review queue</li>
+                            <li>Voice note arrives</li>
+                            <li>Whisper transcribes it</li>
+                            <li>The workflow keeps going</li>
                         </ul>
                     </div>
                 </div>
-                <div class="quote">Useful support. Not a full replacement.</div>
+                <div class="prompt-block">
+                    <p>Add Whisper voice-to-text so I can send voice messages and have them transcribed automatically.</p>
+                </div>
+                <div class="quote">Hackable means it can add the missing part of the workflow.</div>
             </div>
         </div>
 
         <div class="slide">
             <div class="section-number">03</div>
-            <div class="slide-title"><h2>Research and team workflows</h2></div>
+            <div class="slide-title"><h2>Customer Support</h2></div>
             <div class="slide-content">
-                <div class="three-columns">
+                <div class="two-columns">
                     <div class="column">
-                        <h3>Research</h3>
+                        <h3>Support</h3>
                         <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://notebooklm.google" alt="">NotebookLM</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://drive.google.com" alt="">Drive</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.intercom.com" alt="">Intercom</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Gmail</span>
                         </div>
                         <ul>
-                            <li>Source monitoring</li>
-                            <li>Running brief</li>
-                            <li>Saved citations</li>
+                            <li>Triage support requests</li>
+                            <li>Draft replies</li>
+                            <li>Escalate hard cases</li>
                         </ul>
                     </div>
                     <div class="column column-accent">
-                        <h3>STEM and data work</h3>
+                        <h3>Win-back emails</h3>
                         <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/spreadsheets/" alt="">Sheets</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Docs</span>
-                            <span class="tool-chip"><span class="tool-mark mark-openclaw">LG</span>Logs</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://stripe.com" alt="">Stripe</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.intercom.com" alt="">Intercom</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Gmail</span>
                         </div>
                         <ul>
-                            <li>Experiment logs</li>
-                            <li>Recurring checklists</li>
-                            <li>Structured summaries</li>
+                            <li>Spot cancellations</li>
+                            <li>Pull customer context</li>
+                            <li>Send win-back drafts</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">Support work is repetitive enough to automate carefully.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">04</div>
+            <div class="slide-title"><h2>Software Developer</h2></div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>Codebase context</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://github.com" alt="">GitHub</span>
+                            <span class="tool-chip"><span class="tool-mark mark-openclaw">FS</span>Files</span>
+                        </div>
+                        <ul>
+                            <li>Issue triage</li>
+                            <li>PR summaries</li>
+                            <li>Project memory</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Coding assistants</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openai.com" alt="">Codex</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude Code</span>
+                        </div>
+                        <ul>
+                            <li>Research</li>
+                            <li>Draft code changes</li>
+                            <li>Check results</li>
                         </ul>
                     </div>
                     <div class="column column-warm">
-                        <h3>Product and engineering teams</h3>
-                        <div class="tool-row">
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://slack.com" alt="">Slack</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://linear.app" alt="">Linear</span>
-                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://github.com" alt="">GitHub</span>
-                        </div>
+                        <h3>Why OpenClaw</h3>
                         <ul>
-                            <li>Standup summaries</li>
-                            <li>Issue triage</li>
-                            <li>Sprint reporting</li>
+                            <li>Persistent project context</li>
+                            <li>Identity and role separation</li>
+                            <li>Potential team of agents</li>
                         </ul>
                     </div>
                 </div>
-                <div class="callout">
-                    <p><strong>Service angle:</strong> sell the workflow and guardrails.</p>
-                </div>
+                <div class="quote">This is where it starts to feel like a real working environment.</div>
             </div>
         </div>
 
@@ -1311,7 +1423,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="quote">The cheapest tool is the one you do not overbuild.</div>
+                <div class="quote">The cheapest tool is the simplest one that still does the job.</div>
             </div>
         </div>
 
@@ -1330,41 +1442,6 @@
                     <p>I need more flexibility than chat. I do not need a coding assistant. I want identity, personality, and a team of agents.</p>
                 </div>
                 <div class="quote">Use OpenClaw when you hit the limits of everything simpler.</div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="slide-title"><h2>Best practices for real delegation</h2></div>
-            <div class="slide-content">
-                <div class="flow-diagram">
-                    <div class="flow-step"><div class="step-icon">👀</div><div class="step-text">Read-only first</div></div>
-                    <div class="flow-arrow">&rarr;</div>
-                    <div class="flow-step"><div class="step-icon">✍️</div><div class="step-text">Draft first</div></div>
-                    <div class="flow-arrow">&rarr;</div>
-                    <div class="flow-step"><div class="step-icon">✅</div><div class="step-text">Approve actions</div></div>
-                    <div class="flow-arrow">&rarr;</div>
-                    <div class="flow-step"><div class="step-icon">⏰</div><div class="step-text">Automate repeats</div></div>
-                    <div class="flow-arrow">&rarr;</div>
-                    <div class="flow-step"><div class="step-icon">🧱</div><div class="step-text">Split roles later</div></div>
-                </div>
-                <div class="two-columns">
-                    <div class="column">
-                        <h3>Do</h3>
-                        <ul>
-                            <li>Start with one workflow</li>
-                            <li>Draft first</li>
-                            <li>Keep explicit outputs</li>
-                        </ul>
-                    </div>
-                    <div class="column column-warm">
-                        <h3>Do not</h3>
-                        <ul>
-                            <li>Run one giant agent</li>
-                            <li>Use vague goals</li>
-                            <li>Start with the most sensitive workflow</li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
 
