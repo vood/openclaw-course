@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Q&amp;A Webinar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --paper: #f4efe7;
+            --paper-deep: #ece4d7;
+            --panel: rgba(255, 250, 244, 0.86);
+            --ink: #171311;
+            --muted: #665e55;
+            --line: rgba(23, 19, 17, 0.14);
+            --accent: #0f766e;
+            --accent-soft: rgba(15, 118, 110, 0.12);
+            --accent-strong: #0b5f58;
+            --warm: #8d4d15;
+            --warm-soft: rgba(141, 77, 21, 0.10);
+            --danger: #8b1e1e;
+            --radius: 22px;
+            --shadow: 0 24px 80px rgba(23, 19, 17, 0.08);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(15, 118, 110, 0.08), transparent 28%),
+                radial-gradient(circle at 80% 15%, rgba(141, 77, 21, 0.08), transparent 30%),
+                linear-gradient(180deg, #f9f5ee 0%, var(--paper) 45%, var(--paper-deep) 100%);
+            color: var(--ink);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.2;
+            background-image:
+                linear-gradient(rgba(23, 19, 17, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 19, 17, 0.02) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 68px 88px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute;
+            top: 26px;
+            left: 88px;
+            right: 88px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            color: var(--ink);
+        }
+
+        h1 {
+            font-size: 4.8rem;
+            line-height: 0.95;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2.7rem;
+            line-height: 1;
+            margin-bottom: 24px;
+        }
+
+        h3 {
+            font-size: 1.6rem;
+            margin: 18px 0 12px 0;
+        }
+
+        .slide-content {
+            margin-top: 98px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        p, li, td, th {
+            font-size: 1.26rem;
+            line-height: 1.65;
+            color: var(--muted);
+        }
+
+        strong, .highlight {
+            color: var(--ink);
+            font-weight: 800;
+        }
+
+        .accent {
+            color: var(--accent-strong);
+            font-weight: 800;
+        }
+
+        .small {
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(23, 19, 17, 0.06);
+            color: var(--muted);
+            font-size: 0.86rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .title-slide::before {
+            content: "";
+            position: absolute;
+            width: 68vw;
+            height: 68vw;
+            max-width: 980px;
+            max-height: 980px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.14) 0%, rgba(15, 118, 110, 0.04) 28%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .title-slide > * { position: relative; z-index: 1; }
+
+        .title-slide h1 {
+            max-width: 920px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--muted);
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .hero-line {
+            font-size: 1.05rem;
+            color: var(--muted);
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .hero-line span {
+            color: var(--accent-strong);
+        }
+
+        ul {
+            list-style: none;
+            margin: 18px 0;
+        }
+
+        li {
+            margin: 12px 0;
+            padding-left: 26px;
+            position: relative;
+        }
+
+        li::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            position: absolute;
+            left: 0;
+            top: 13px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-top: 28px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .column,
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .column h3,
+        .panel h3 {
+            margin-top: 0;
+            color: var(--ink);
+        }
+
+        .column-accent {
+            background: linear-gradient(180deg, rgba(15, 118, 110, 0.10), rgba(255, 250, 244, 0.94));
+            border-color: rgba(15, 118, 110, 0.18);
+        }
+
+        .column-warm {
+            background: linear-gradient(180deg, rgba(141, 77, 21, 0.08), rgba(255, 250, 244, 0.94));
+            border-color: rgba(141, 77, 21, 0.16);
+        }
+
+        .column-ink {
+            background: linear-gradient(180deg, rgba(23, 19, 17, 0.96), rgba(30, 25, 22, 0.94));
+            color: #f4efe7;
+            border-color: rgba(23, 19, 17, 0.2);
+        }
+
+        .column-ink h3,
+        .column-ink p,
+        .column-ink li,
+        .column-ink .highlight {
+            color: #f4efe7;
+        }
+
+        .column-ink li::before { background: #9dd8d2; }
+
+        .quote {
+            margin-top: 26px;
+            padding-left: 22px;
+            border-left: 4px solid var(--accent);
+            color: var(--ink);
+            font-size: 1.38rem;
+            line-height: 1.55;
+            font-family: 'Fraunces', serif;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 14px;
+            margin: 28px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            min-width: 154px;
+            max-width: 200px;
+            flex: 1;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            padding: 18px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .flow-step .step-icon {
+            font-size: 1.9rem;
+            margin-bottom: 8px;
+        }
+
+        .flow-step .step-text {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--ink);
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius);
+            padding: 28px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        .stat-label {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .section-number {
+            position: absolute;
+            top: 6px;
+            right: 24px;
+            font-size: 8rem;
+            line-height: 1;
+            font-weight: 800;
+            color: rgba(23, 19, 17, 0.06);
+        }
+
+        .prompt-block {
+            background: #171311;
+            color: #f4efe7;
+            border-radius: 18px;
+            padding: 18px 22px;
+            margin-top: 22px;
+            max-width: 840px;
+            box-shadow: var(--shadow);
+        }
+
+        .prompt-block::before {
+            content: "Example instruction";
+            display: block;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: rgba(244, 239, 231, 0.62);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .prompt-block p {
+            color: #f4efe7;
+            font-size: 1.06rem;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .scale-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 28px;
+        }
+
+        .scale-card {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 22px;
+            padding: 20px 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .stage-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: var(--ink);
+            background: rgba(23, 19, 17, 0.05);
+        }
+
+        .stage-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .scale-simple .stage-icon {
+            background: rgba(23, 19, 17, 0.07);
+        }
+
+        .scale-openclaw .stage-icon {
+            background: rgba(15, 118, 110, 0.14);
+            color: var(--accent-strong);
+        }
+
+        .scale-card .level {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .scale-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+        }
+
+        .scale-card p {
+            font-size: 1rem;
+            line-height: 1.55;
+        }
+
+        .scale-card .request {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(23, 19, 17, 0.08);
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .scale-simple {
+            background: linear-gradient(180deg, rgba(23, 19, 17, 0.05), rgba(255, 250, 244, 0.96));
+        }
+
+        .scale-openclaw {
+            background: linear-gradient(180deg, rgba(15, 118, 110, 0.14), rgba(255, 250, 244, 0.96));
+            border-color: rgba(15, 118, 110, 0.22);
+        }
+
+        .scale-cap {
+            margin-top: 18px;
+            padding: 16px 20px;
+            border-radius: 18px;
+            background: rgba(23, 19, 17, 0.05);
+            font-size: 1.04rem;
+            color: var(--ink);
+        }
+
+        .scale-arrow {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .scale-arrow-line {
+            flex: 1;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(23, 19, 17, 0.25), rgba(15, 118, 110, 0.9));
+            position: relative;
+        }
+
+        .scale-arrow-line::after {
+            content: "";
+            position: absolute;
+            right: -2px;
+            top: 50%;
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid var(--accent-strong);
+            border-right: 2px solid var(--accent-strong);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 28px;
+            margin-top: 26px;
+            align-items: start;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .badge-simple {
+            background: rgba(23, 19, 17, 0.08);
+            color: var(--ink);
+        }
+
+        .badge-openclaw {
+            background: rgba(15, 118, 110, 0.14);
+            color: var(--accent-strong);
+        }
+
+        .callout {
+            margin-top: 18px;
+            padding: 18px 22px;
+            border-radius: 18px;
+            background: rgba(15, 118, 110, 0.08);
+            border: 1px solid rgba(15, 118, 110, 0.18);
+            color: var(--ink);
+        }
+
+        .callout p {
+            color: var(--ink);
+            font-size: 1.08rem;
+        }
+
+        .tool-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .tool-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px 8px 8px;
+            border-radius: 999px;
+            background: rgba(23, 19, 17, 0.06);
+            border: 1px solid rgba(23, 19, 17, 0.08);
+            color: var(--ink);
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .tool-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            object-fit: contain;
+            flex: 0 0 20px;
+        }
+
+        .tool-mark {
+            min-width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+
+        .mark-chatgpt { background: #111827; }
+        .mark-claude { background: #9a5a17; }
+        .mark-gemini { background: #2563eb; }
+        .mark-perplexity { background: #0f766e; }
+        .mark-notebooklm { background: #7c3aed; }
+        .mark-openclaw { background: #0b5f58; }
+        .mark-gmail { background: #c5221f; }
+        .mark-outlook { background: #2563eb; }
+        .mark-whatsapp { background: #16a34a; }
+        .mark-calendar { background: #b91c1c; }
+        .mark-notes { background: #ca8a04; }
+        .mark-telegram { background: #0284c7; }
+        .mark-linkedin { background: #0a66c2; }
+        .mark-hubspot { background: #f97316; }
+        .mark-docs { background: #2563eb; }
+        .mark-sheets { background: #15803d; }
+        .mark-stripe { background: #635bff; }
+        .mark-drive { background: #059669; }
+        .mark-slack { background: #7c3aed; }
+        .mark-linear { background: #111827; }
+        .mark-github { background: #111827; }
+        .mark-1password { background: #2563eb; }
+        .mark-mac { background: #374151; }
+        .mark-hetzner { background: #dc2626; }
+        .mark-digitalocean { background: #2563eb; }
+        .mark-codex { background: #111827; }
+        .mark-claudecode { background: #9a5a17; }
+
+        .progress-bar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            height: 4px;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent), var(--warm));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed;
+            right: 28px;
+            bottom: 18px;
+            color: rgba(23, 19, 17, 0.46);
+            font-size: 0.96rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            z-index: 100;
+        }
+
+        .nav-hint {
+            position: fixed;
+            left: 28px;
+            bottom: 18px;
+            color: rgba(23, 19, 17, 0.38);
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            z-index: 100;
+        }
+
+        @media (max-width: 1200px) {
+            html { font-size: 14px; }
+            .slide { padding: 56px 64px; }
+            .slide-title { left: 64px; right: 64px; }
+            .scale-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 900px) {
+            html { font-size: 13px; }
+            .slide { padding: 40px 28px; }
+            .slide-title {
+                left: 28px;
+                right: 28px;
+                top: 18px;
+            }
+            .slide-content { margin-top: 92px; }
+            .two-columns,
+            .three-columns,
+            .decision-grid,
+            .stat-grid,
+            .scale-grid {
+                grid-template-columns: 1fr;
+            }
+            .flow-arrow { display: none; }
+            h1 { font-size: 3.4rem; }
+            h2 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <div class="slide title-slide active">
+            <div class="eyebrow">OpenClaw Webinar</div>
+            <h1>OpenClaw</h1>
+            <div class="subtitle">What it is. What it is good for. How much control you want to keep.</div>
+            <div class="hero-line">Start with the <span>simplest tool</span> that can do the job.</div>
+            <p style="margin-top: 36px; color: var(--muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>What is OpenClaw?</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:72%;">
+                <p style="font-size: 2.45rem; line-height: 1.2; color: var(--ink); max-width: 980px;">
+                    <span class="accent">An AI system with its own files, external systems, and recurring tasks.</span><br>
+                    It can keep working after the chat ends.
+                </p>
+                <div class="two-columns">
+                    <div class="column">
+                        <span class="badge badge-simple">Simple AI tools</span>
+                        <h3>What they do</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
+                        </div>
+                        <ul>
+                            <li>You ask</li>
+                            <li>They answer</li>
+                            <li>The job ends in chat</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <span class="badge badge-openclaw">OpenClaw</span>
+                        <h3>What makes it different</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
+                        </div>
+                        <ul>
+                            <li>Gets a workspace</li>
+                            <li>Connects to external systems</li>
+                            <li>Can keep running</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">The big difference is persistence.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Where memory lives</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If you want a real system, the context has to live <span class="highlight">outside the chat box</span>.</p>
+                <div class="two-columns">
+                    <div class="column column-accent">
+                        <h3>Real context</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://drive.google.com" alt="">Drive</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Docs</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Email</span>
+                        </div>
+                        <ul>
+                            <li>Most of your life is in files</li>
+                            <li>Notes, docs, folders, email</li>
+                            <li>Hard to keep uploading everything</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Identity</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
+                            <span class="tool-chip"><span class="tool-mark mark-openclaw">ID</span>Identity</span>
+                            <span class="tool-chip"><span class="tool-mark mark-openclaw">PS</span>Personality</span>
+                        </div>
+                        <ul>
+                            <li>Name, tone, rules</li>
+                            <li>Personality carries across time</li>
+                            <li>People like building their own bot</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">Chat tools see what you paste. Systems remember what you keep.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Five levels of autonomy</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">The key difference is the role you keep.</p>
+                <div class="scale-grid">
+                    <div class="scale-card scale-simple">
+                        <div class="stage-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 6.5a3.5 3.5 0 0 1 3.5-3.5h9A3.5 3.5 0 0 1 20 6.5v5A3.5 3.5 0 0 1 16.5 15H11l-4 4v-4H7.5A3.5 3.5 0 0 1 4 11.5z"/>
+                            </svg>
+                        </div>
+                        <div class="level">Level 1</div>
+                        <h3>Operator</h3>
+                        <p>ChatGPT. Claude. Gemini. Perplexity.</p>
+                        <div class="request">“Help me write a reply to this email.”</div>
+                    </div>
+                    <div class="scale-card scale-simple">
+                        <div class="stage-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 19h14"/>
+                                <path d="M7 15 16.5 5.5a1.8 1.8 0 0 1 2.5 2.5L9.5 17.5 6 18z"/>
+                            </svg>
+                        </div>
+                        <div class="level">Level 2</div>
+                        <h3>Collaborator</h3>
+                        <p>NotebookLM. ChatGPT Projects. Gemini in Docs.</p>
+                        <div class="request">“Help me sort these emails into reply, archive, and ignore.”</div>
+                    </div>
+                    <div class="scale-card scale-openclaw">
+                        <div class="stage-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="m5 12 4 4 10-10"/>
+                                <path d="M4 6h4"/>
+                                <path d="M4 18h8"/>
+                            </svg>
+                        </div>
+                        <div class="level">Level 3</div>
+                        <h3>Consultant</h3>
+                        <p>OpenClaw that takes the lead and checks in.</p>
+                        <div class="request">“Read my inbox, suggest priorities, and ask me what to do.”</div>
+                    </div>
+                    <div class="scale-card scale-openclaw">
+                        <div class="stage-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 7v5l3 3"/>
+                                <circle cx="12" cy="12" r="8"/>
+                            </svg>
+                        </div>
+                        <div class="level">Level 4</div>
+                        <h3>Approver</h3>
+                        <p>OpenClaw that runs the workflow and stops for approval.</p>
+                        <div class="request">“Read my inbox, draft replies, and stop only for approval.”</div>
+                    </div>
+                    <div class="scale-card scale-openclaw">
+                        <div class="stage-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="5" cy="12" r="2"/>
+                                <circle cx="19" cy="6" r="2"/>
+                                <circle cx="19" cy="18" r="2"/>
+                                <path d="M7 12h4"/>
+                                <path d="m15 7-3 4"/>
+                                <path d="m15 17-3-4"/>
+                            </svg>
+                        </div>
+                        <div class="level">Level 5</div>
+                        <h3>Observer</h3>
+                        <p>Full autonomy. You mostly monitor.</p>
+                        <div class="request">“Handle my inbox end to end while I only review exceptions.”</div>
+                    </div>
+                </div>
+                <div class="scale-arrow">
+                    <span>Shorter, simpler</span>
+                    <div class="scale-arrow-line"></div>
+                    <span>Longer, more complex</span>
+                </div>
+                <div class="scale-cap">
+                    <strong>Rule of thumb:</strong> start at Operator. Most people should live between Operator and Approver.
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Three levels of setup complexity</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">Different tools ask for very different amounts of setup.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <span class="badge badge-simple">No setup</span>
+                        <h3>Easy</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
+                        </div>
+                        <ul>
+                            <li>Open it</li>
+                            <li>Ask</li>
+                            <li>Done</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <span class="badge badge-openclaw">Some setup</span>
+                        <h3>Medium</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openai.com" alt="">Codex</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude Code</span>
+                        </div>
+                        <ul>
+                            <li>Needs a project</li>
+                            <li>Needs a terminal</li>
+                            <li>More technical</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <span class="badge badge-openclaw">Most setup</span>
+                        <h3>Highest</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
+                        </div>
+                        <ul>
+                            <li>Needs a workspace</li>
+                            <li>Needs external systems and accounts</li>
+                            <li>Needs maintenance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">Start at the easiest level. Move up only when the workflow forces it.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>You probably do not need OpenClaw if...</h2></div>
+            <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
+                <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If the work <span class="highlight">ends with the chat</span>, do not build an agent.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>Use simple AI for</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
+                        </div>
+                        <ul>
+                            <li>Explain</li>
+                            <li>Summarize</li>
+                            <li>Draft</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Still simple AI</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://notebooklm.google" alt="">NotebookLM</span>
+                        </div>
+                        <ul>
+                            <li>One email</li>
+                            <li>One plan</li>
+                            <li>One research pass</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <h3>Why</h3>
+                        <ul>
+                            <li>Less setup</li>
+                            <li>Less cost</li>
+                            <li>Less risk</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Boundary:</strong> no files, no external systems, no schedule, usually no OpenClaw.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">01</div>
+            <div class="slide-title"><h2>Everyday personal workflows</h2></div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>Inbox</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Gmail</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://outlook.live.com" alt="">Outlook</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.whatsapp.com" alt="">WhatsApp</span>
+                        </div>
+                        <ul>
+                            <li>Morning digest</li>
+                            <li>Draft replies</li>
+                            <li>Missed follow-ups</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Planning</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://calendar.google.com" alt="">Calendar</span>
+                            <span class="tool-chip"><span class="tool-mark mark-notes">NT</span>Notes</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://telegram.org" alt="">Telegram</span>
+                        </div>
+                        <ul>
+                            <li>Daily brief</li>
+                            <li>Meeting prep</li>
+                            <li>Running task list</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <h3>Use it when</h3>
+                        <ul>
+                            <li>It repeats</li>
+                            <li>It spans apps</li>
+                            <li>It needs history</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Good boundary:</strong> one reply = Operator. Shared work = Collaborator. Daily inbox workflow = Approver.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">02</div>
+            <div class="slide-title"><h2>Work tasks and business workflows</h2></div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Sales and content</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.linkedin.com" alt="">LinkedIn</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.hubspot.com" alt="">HubSpot</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Google Docs</span>
+                        </div>
+                        <ul>
+                            <li>Lead research</li>
+                            <li>Outreach drafts</li>
+                            <li>Content pipeline</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>Finance and admin</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://mail.google.com" alt="">Gmail</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/spreadsheets/" alt="">Sheets</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://stripe.com" alt="">Stripe</span>
+                        </div>
+                        <ul>
+                            <li>Invoice triage</li>
+                            <li>Weekly reports</li>
+                            <li>Contract review queue</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">Useful support. Not a full replacement.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="section-number">03</div>
+            <div class="slide-title"><h2>Research and team workflows</h2></div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="column">
+                        <h3>Research</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.perplexity.ai" alt="">Perplexity</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://notebooklm.google" alt="">NotebookLM</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://drive.google.com" alt="">Drive</span>
+                        </div>
+                        <ul>
+                            <li>Source monitoring</li>
+                            <li>Running brief</li>
+                            <li>Saved citations</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>STEM and data work</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/spreadsheets/" alt="">Sheets</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://docs.google.com/document/" alt="">Docs</span>
+                            <span class="tool-chip"><span class="tool-mark mark-openclaw">LG</span>Logs</span>
+                        </div>
+                        <ul>
+                            <li>Experiment logs</li>
+                            <li>Recurring checklists</li>
+                            <li>Structured summaries</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <h3>Product and engineering teams</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://slack.com" alt="">Slack</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://linear.app" alt="">Linear</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://github.com" alt="">GitHub</span>
+                        </div>
+                        <ul>
+                            <li>Standup summaries</li>
+                            <li>Issue triage</li>
+                            <li>Sprint reporting</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Service angle:</strong> sell the workflow and guardrails.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>What OpenClaw can work across</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">It matters because it can sit across the places where work already lives.</p>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">💬</div>
+                        <div class="stat-label">Messaging<br><span class="small">Telegram, Slack</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">📧</div>
+                        <div class="stat-label">Email and calendar<br><span class="small">Gmail, Outlook</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">🌐</div>
+                        <div class="stat-label">Browser<br><span class="small">Chrome-based workflows</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">📁</div>
+                        <div class="stat-label">Files<br><span class="small">Folders, notes, outputs</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">🔐</div>
+                        <div class="stat-label">Credentials<br><span class="small">1Password-style access</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">📊</div>
+                        <div class="stat-label">Docs and data<br><span class="small">Docs, Sheets, logs</span></div>
+                    </div>
+                </div>
+                <div class="quote">This is why it feels more technical.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>What you need to get real value</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">You do not need to be a programmer. You do need patience and one workflow worth the setup tax.</p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>You do not need</h3>
+                        <ul>
+                            <li>To code everything</li>
+                            <li>To start big</li>
+                            <li>To automate everything</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>You do need</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openai.com" alt="">Codex</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude Code</span>
+                        </div>
+                        <ul>
+                            <li>One real workflow</li>
+                            <li>A safe boundary</li>
+                            <li>Willingness to review</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flow-diagram" style="margin-top: 24px;">
+                    <div class="flow-step"><div class="step-icon">1</div><div class="step-text">Pick one workflow</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">2</div><div class="step-text">Create the boundary</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">3</div><div class="step-text">Connect the minimum</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">4</div><div class="step-text">Verify end to end</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Three levels of risk</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">Risk goes up when the tool can read more, change more, and keep going without you.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <span class="badge badge-simple">Low risk</span>
+                        <h3>Chat tools</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
+                        </div>
+                        <ul>
+                            <li>No ongoing access</li>
+                            <li>No background workflow</li>
+                            <li>The job ends in chat</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <span class="badge badge-openclaw">Medium risk</span>
+                        <h3>Coding agents</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openai.com" alt="">Codex</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude Code</span>
+                        </div>
+                        <ul>
+                            <li>Can touch local files</li>
+                            <li>Can use terminal tools</li>
+                            <li>Needs review</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <span class="badge badge-openclaw">High risk</span>
+                        <h3>OpenClaw</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
+                        </div>
+                        <ul>
+                            <li>Can span tools and accounts</li>
+                            <li>Can keep running</li>
+                            <li>Needs strong boundaries</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Ask two questions:</strong> what can it read? what can it change?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Where to run it, and where not to</h2></div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>Best default</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><span class="tool-mark mark-mac">MM</span>Mac Mini</span>
+                            <span class="tool-chip"><span class="tool-mark mark-mac">DU</span>Dedicated user</span>
+                        </div>
+                        <ul>
+                            <li>Separate machine or user</li>
+                            <li>Separate accounts</li>
+                            <li>Least privilege</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Cloud option</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.hetzner.com" alt="">Hetzner</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://www.digitalocean.com" alt="">DigitalOcean</span>
+                        </div>
+                        <ul>
+                            <li>Cleaner isolation</li>
+                            <li>Always on</li>
+                            <li>More ops work</li>
+                        </ul>
+                    </div>
+                    <div class="column column-ink">
+                        <h3>What not to do</h3>
+                        <ul>
+                            <li>Primary company laptop</li>
+                            <li>Sensitive accounts first</li>
+                            <li>One agent with everything</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Short version:</strong> company laptop? usually no. Local is simpler. VPS is cleaner if you can run it.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Three levels of cost</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">Think in rough bands, not exact accounting.</p>
+                <div class="three-columns">
+                    <div class="column">
+                        <span class="badge badge-simple">Free</span>
+                        <h3>Chat tools</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://chatgpt.com" alt="">ChatGPT</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://gemini.google.com" alt="">Gemini</span>
+                        </div>
+                        <ul>
+                            <li>Free tiers exist</li>
+                            <li>Lowest commitment</li>
+                            <li>Cheapest place to start</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <span class="badge badge-openclaw">$20-$200</span>
+                        <h3>Coding agents</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openai.com" alt="">Codex</span>
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://claude.ai" alt="">Claude Code</span>
+                        </div>
+                        <ul>
+                            <li>Subscription-like pricing</li>
+                            <li>More hands-on time</li>
+                            <li>Still manageable</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <span class="badge badge-openclaw">$200+</span>
+                        <h3>OpenClaw</h3>
+                        <div class="tool-row">
+                            <span class="tool-chip"><img class="tool-icon" src="https://www.google.com/s2/favicons?sz=64&amp;domain_url=https://openclaw.ai" alt="">OpenClaw</span>
+                        </div>
+                        <ul>
+                            <li>Model spend can climb fast</li>
+                            <li>Higher setup cost</li>
+                            <li>Ongoing maintenance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote">The cheapest tool is the one you do not overbuild.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>OpenClaw starts to make sense when...</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">OpenClaw becomes useful when chat and coding assistants both stop being enough.</p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">💬</div><div class="step-text">Chat tools first</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">⌨️</div><div class="step-text">Then coding agents</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🦀</div><div class="step-text">Then OpenClaw</div></div>
+                </div>
+                <div class="prompt-block">
+                    <p>I need more flexibility than chat. I do not need a coding assistant. I want identity, personality, and a team of agents.</p>
+                </div>
+                <div class="quote">Use OpenClaw when you hit the limits of everything simpler.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>Best practices for real delegation</h2></div>
+            <div class="slide-content">
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">👀</div><div class="step-text">Read-only first</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">✍️</div><div class="step-text">Draft first</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">✅</div><div class="step-text">Approve actions</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">⏰</div><div class="step-text">Automate repeats</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧱</div><div class="step-text">Split roles later</div></div>
+                </div>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Do</h3>
+                        <ul>
+                            <li>Start with one workflow</li>
+                            <li>Draft first</li>
+                            <li>Keep explicit outputs</li>
+                        </ul>
+                    </div>
+                    <div class="column column-warm">
+                        <h3>Do not</h3>
+                        <ul>
+                            <li>Run one giant agent</li>
+                            <li>Use vague goals</li>
+                            <li>Start with the most sensitive workflow</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>If you want to go deeper, this is where the workshops fit</h2></div>
+            <div class="slide-content">
+                <p style="max-width: 980px;">The webinar gives the map. The workshops give the build path.</p>
+                <div class="stat-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+                    <div class="stat-card">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label"><strong>Foundation</strong><br>Setup and safe boundaries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label"><strong>Workflows</strong><br>Scheduling, browser, integrations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label"><strong>Security</strong><br>Least privilege and structure</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label"><strong>Advanced</strong><br>Providers, maturity, operations</div>
+                    </div>
+                </div>
+                <div class="callout">
+                    <p><strong>Bridge:</strong> understand here. Implement there.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <div class="eyebrow">Live Q&amp;A</div>
+            <h1>Questions?</h1>
+            <div class="subtitle">What role do you want to keep?</div>
+        </div>
+
+        <div class="slide title-slide">
+            <div class="eyebrow">Thank you</div>
+            <h1>Use simple AI tools for thinking.<br>Use OpenClaw for operating.</h1>
+            <div class="subtitle">Choose the simplest tool that matches the job.</div>
+            <p style="margin-top: 34px; color: var(--muted); font-size: 1.1rem;">Artem &amp; Vasili</p>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? nextSlide() : prevSlide();
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
