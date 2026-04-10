@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h12_D4",
+  "description": "Depth D=4",
+  "mean_accuracy": 0.3055555555555555,
+  "std_accuracy": 0.017361111111111105,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.2881944444444444,
+      "folds": [
+        0.3263888888888889,
+        0.25
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.32291666666666663,
+      "folds": [
+        0.3958333333333333,
+        0.25
+      ]
+    }
+  },
+  "elapsed_seconds": 201.63893151283264
+}

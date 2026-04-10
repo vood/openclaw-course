@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h11_kern128",
+  "description": "Kernel length 128",
+  "mean_accuracy": 0.3993055555555556,
+  "std_accuracy": 0.0034722222222222376,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.4027777777777778,
+      "folds": [
+        0.3888888888888889,
+        0.4166666666666667
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.3958333333333333,
+      "folds": [
+        0.5138888888888888,
+        0.2777777777777778
+      ]
+    }
+  },
+  "elapsed_seconds": 146.955260515213
+}

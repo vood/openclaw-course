@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h07_bs32",
+  "description": "Batch size 32",
+  "mean_accuracy": 0.3732638888888889,
+  "std_accuracy": 0.032986111111111105,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.3402777777777778,
+      "folds": [
+        0.4097222222222222,
+        0.2708333333333333
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.40625,
+      "folds": [
+        0.375,
+        0.4375
+      ]
+    }
+  },
+  "elapsed_seconds": 173.32502841949463
+}

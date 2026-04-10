@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h14_combo_arch",
+  "description": "F1=16+kern128+AdamW+cosine+drop25+200ep",
+  "mean_accuracy": 0.4670138888888889,
+  "std_accuracy": 0.057291666666666685,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.4097222222222222,
+      "folds": [
+        0.4444444444444444,
+        0.375
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.5243055555555556,
+      "folds": [
+        0.5486111111111112,
+        0.5
+      ]
+    }
+  },
+  "elapsed_seconds": 370.3917992115021
+}

@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h08_F16",
+  "description": "F1=16 temporal filters",
+  "mean_accuracy": 0.3107638888888889,
+  "std_accuracy": 0.060763888888888895,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.25,
+      "folds": [
+        0.25,
+        0.25
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.3715277777777778,
+      "folds": [
+        0.4236111111111111,
+        0.3194444444444444
+      ]
+    }
+  },
+  "elapsed_seconds": 80.79569506645203
+}

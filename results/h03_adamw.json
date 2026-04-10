@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h03_adamw",
+  "description": "AdamW wd=0.01",
+  "mean_accuracy": 0.3246527777777778,
+  "std_accuracy": 0.05034722222222221,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.2743055555555556,
+      "folds": [
+        0.25,
+        0.2986111111111111
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.375,
+      "folds": [
+        0.2916666666666667,
+        0.4583333333333333
+      ]
+    }
+  },
+  "elapsed_seconds": 204.41759586334229
+}

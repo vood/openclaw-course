@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h01_longer",
+  "description": "200 epochs instead of 50",
+  "mean_accuracy": 0.638888888888889,
+  "std_accuracy": 0.00347222222222221,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.6354166666666667,
+      "folds": [
+        0.6180555555555556,
+        0.6527777777777778
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.6423611111111112,
+      "folds": [
+        0.5694444444444444,
+        0.7152777777777778
+      ]
+    }
+  },
+  "elapsed_seconds": 753.1383085250854
+}

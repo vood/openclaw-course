@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h13_combo_train",
+  "description": "AdamW+cosine+drop25+200ep",
+  "mean_accuracy": 0.6232638888888888,
+  "std_accuracy": 0.00868055555555558,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.6145833333333333,
+      "folds": [
+        0.6388888888888888,
+        0.5902777777777778
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.6319444444444444,
+      "folds": [
+        0.6111111111111112,
+        0.6527777777777778
+      ]
+    }
+  },
+  "elapsed_seconds": 716.809323310852
+}

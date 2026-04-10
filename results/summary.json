@@ -1,0 +1,373 @@
+{
+  "ranked_results": [
+    {
+      "hypothesis": "h01_longer",
+      "description": "200 epochs instead of 50",
+      "mean_accuracy": 0.638888888888889,
+      "std_accuracy": 0.00347222222222221,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.6354166666666667,
+          "folds": [
+            0.6180555555555556,
+            0.6527777777777778
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.6423611111111112,
+          "folds": [
+            0.5694444444444444,
+            0.7152777777777778
+          ]
+        }
+      },
+      "elapsed_seconds": 753.1383085250854
+    },
+    {
+      "hypothesis": "h13_combo_train",
+      "description": "AdamW+cosine+drop25+200ep",
+      "mean_accuracy": 0.6232638888888888,
+      "std_accuracy": 0.00868055555555558,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.6145833333333333,
+          "folds": [
+            0.6388888888888888,
+            0.5902777777777778
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.6319444444444444,
+          "folds": [
+            0.6111111111111112,
+            0.6527777777777778
+          ]
+        }
+      },
+      "elapsed_seconds": 716.809323310852
+    },
+    {
+      "hypothesis": "h14_combo_arch",
+      "description": "F1=16+kern128+AdamW+cosine+drop25+200ep",
+      "mean_accuracy": 0.4670138888888889,
+      "std_accuracy": 0.057291666666666685,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.4097222222222222,
+          "folds": [
+            0.4444444444444444,
+            0.375
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.5243055555555556,
+          "folds": [
+            0.5486111111111112,
+            0.5
+          ]
+        }
+      },
+      "elapsed_seconds": 370.3917992115021
+    },
+    {
+      "hypothesis": "h15_kitchen",
+      "description": "F16+D4+kern128+mubeta+AdamW+cosine+drop25+200ep",
+      "mean_accuracy": 0.4253472222222222,
+      "std_accuracy": 0.04340277777777779,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.3819444444444444,
+          "folds": [
+            0.4166666666666667,
+            0.3472222222222222
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.46875,
+          "folds": [
+            0.4236111111111111,
+            0.5138888888888888
+          ]
+        }
+      },
+      "elapsed_seconds": 324.4571530818939
+    },
+    {
+      "hypothesis": "h11_kern128",
+      "description": "Kernel length 128",
+      "mean_accuracy": 0.3993055555555556,
+      "std_accuracy": 0.0034722222222222376,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.4027777777777778,
+          "folds": [
+            0.3888888888888889,
+            0.4166666666666667
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.3958333333333333,
+          "folds": [
+            0.5138888888888888,
+            0.2777777777777778
+          ]
+        }
+      },
+      "elapsed_seconds": 146.955260515213
+    },
+    {
+      "hypothesis": "h07_bs32",
+      "description": "Batch size 32",
+      "mean_accuracy": 0.3732638888888889,
+      "std_accuracy": 0.032986111111111105,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.3402777777777778,
+          "folds": [
+            0.4097222222222222,
+            0.2708333333333333
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.40625,
+          "folds": [
+            0.375,
+            0.4375
+          ]
+        }
+      },
+      "elapsed_seconds": 173.32502841949463
+    },
+    {
+      "hypothesis": "baseline",
+      "description": "Default EEGNet (50ep, lr=1e-3, drop=0.5, Adam, bs=64, 4-38Hz)",
+      "mean_accuracy": 0.35416666666666663,
+      "std_accuracy": 0.04513888888888887,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.3090277777777778,
+          "folds": [
+            0.2777777777777778,
+            0.3402777777777778
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.3993055555555555,
+          "folds": [
+            0.5416666666666666,
+            0.2569444444444444
+          ]
+        }
+      },
+      "elapsed_seconds": 191.97982931137085
+    },
+    {
+      "hypothesis": "h05_drop25",
+      "description": "Dropout 0.25",
+      "mean_accuracy": 0.3472222222222222,
+      "std_accuracy": 0.05208333333333337,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.29513888888888884,
+          "folds": [
+            0.2708333333333333,
+            0.3194444444444444
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.3993055555555556,
+          "folds": [
+            0.3680555555555556,
+            0.4305555555555556
+          ]
+        }
+      },
+      "elapsed_seconds": 204.9145588874817
+    },
+    {
+      "hypothesis": "h06_bs128",
+      "description": "Batch size 128",
+      "mean_accuracy": 0.3350694444444445,
+      "std_accuracy": 0.029513888888888895,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.36458333333333337,
+          "folds": [
+            0.25,
+            0.4791666666666667
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.3055555555555556,
+          "folds": [
+            0.2986111111111111,
+            0.3125
+          ]
+        }
+      },
+      "elapsed_seconds": 200.59020590782166
+    },
+    {
+      "hypothesis": "h03_adamw",
+      "description": "AdamW wd=0.01",
+      "mean_accuracy": 0.3246527777777778,
+      "std_accuracy": 0.05034722222222221,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.2743055555555556,
+          "folds": [
+            0.25,
+            0.2986111111111111
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.375,
+          "folds": [
+            0.2916666666666667,
+            0.4583333333333333
+          ]
+        }
+      },
+      "elapsed_seconds": 204.41759586334229
+    },
+    {
+      "hypothesis": "h08_F16",
+      "description": "F1=16 temporal filters",
+      "mean_accuracy": 0.3107638888888889,
+      "std_accuracy": 0.060763888888888895,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.25,
+          "folds": [
+            0.25,
+            0.25
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.3715277777777778,
+          "folds": [
+            0.4236111111111111,
+            0.3194444444444444
+          ]
+        }
+      },
+      "elapsed_seconds": 80.79569506645203
+    },
+    {
+      "hypothesis": "h12_D4",
+      "description": "Depth D=4",
+      "mean_accuracy": 0.3055555555555555,
+      "std_accuracy": 0.017361111111111105,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.2881944444444444,
+          "folds": [
+            0.3263888888888889,
+            0.25
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.32291666666666663,
+          "folds": [
+            0.3958333333333333,
+            0.25
+          ]
+        }
+      },
+      "elapsed_seconds": 201.63893151283264
+    },
+    {
+      "hypothesis": "h10_mubeta",
+      "description": "8-30 Hz mu/beta",
+      "mean_accuracy": 0.2934027777777778,
+      "std_accuracy": 0.005208333333333343,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.2986111111111111,
+          "folds": [
+            0.2847222222222222,
+            0.3125
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.2881944444444444,
+          "folds": [
+            0.2986111111111111,
+            0.2777777777777778
+          ]
+        }
+      },
+      "elapsed_seconds": 179.23461198806763
+    },
+    {
+      "hypothesis": "h09_wide",
+      "description": "1-45 Hz",
+      "mean_accuracy": 0.2829861111111111,
+      "std_accuracy": 0.005208333333333315,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.2777777777777778,
+          "folds": [
+            0.3263888888888889,
+            0.22916666666666666
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.2881944444444444,
+          "folds": [
+            0.3194444444444444,
+            0.2569444444444444
+          ]
+        }
+      },
+      "elapsed_seconds": 179.8756923675537
+    },
+    {
+      "hypothesis": "h04_cosine",
+      "description": "Cosine LR",
+      "mean_accuracy": 0.2517361111111111,
+      "std_accuracy": 0.001736111111111105,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.25,
+          "folds": [
+            0.25,
+            0.25
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.2534722222222222,
+          "folds": [
+            0.25,
+            0.2569444444444444
+          ]
+        }
+      },
+      "elapsed_seconds": 200.88554096221924
+    },
+    {
+      "hypothesis": "h02_lr5e4",
+      "description": "lr=5e-4",
+      "mean_accuracy": 0.24652777777777776,
+      "std_accuracy": 0.017361111111111077,
+      "per_subject_session": {
+        "s1_0train": {
+          "mean": 0.22916666666666669,
+          "folds": [
+            0.25,
+            0.20833333333333334
+          ]
+        },
+        "s3_0train": {
+          "mean": 0.26388888888888884,
+          "folds": [
+            0.2569444444444444,
+            0.2708333333333333
+          ]
+        }
+      },
+      "elapsed_seconds": 202.05130767822266
+    }
+  ],
+  "baseline_accuracy": 0.35416666666666663
+}

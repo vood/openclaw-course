@@ -1,0 +1,23 @@
+{
+  "hypothesis": "h06_bs128",
+  "description": "Batch size 128",
+  "mean_accuracy": 0.3350694444444445,
+  "std_accuracy": 0.029513888888888895,
+  "per_subject_session": {
+    "s1_0train": {
+      "mean": 0.36458333333333337,
+      "folds": [
+        0.25,
+        0.4791666666666667
+      ]
+    },
+    "s3_0train": {
+      "mean": 0.3055555555555556,
+      "folds": [
+        0.2986111111111111,
+        0.3125
+      ]
+    }
+  },
+  "elapsed_seconds": 200.59020590782166
+}
