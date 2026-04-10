@@ -34,7 +34,6 @@
     // Forward keyboard navigation to iframe when parent has focus
     document.addEventListener('keydown', function (e) {
         if (!iframe || !iframe.contentWindow) return;
-        // Don't forward if user is typing in a form element
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
@@ -82,23 +81,6 @@
         }
     }
 
-    // Sidebar tabs
-    var tocTab = document.getElementById('tab-toc');
-    var contentTab = document.getElementById('tab-content');
-    var tocPanel = document.getElementById('sidebar-toc');
-    var contentPanel = document.getElementById('sidebar-content');
-
-    function switchTab(tab) {
-        if (!tocTab || !contentTab) return;
-        tocTab.classList.toggle('active', tab === 'toc');
-        contentTab.classList.toggle('active', tab === 'content');
-        tocPanel.classList.toggle('active', tab === 'toc');
-        contentPanel.classList.toggle('active', tab === 'content');
-    }
-
-    if (tocTab) tocTab.addEventListener('click', function () { switchTab('toc'); });
-    if (contentTab) contentTab.addEventListener('click', function () { switchTab('content'); });
-
     // Mobile sidebar toggle
     var sidebar = document.querySelector('.viewer-sidebar');
     var toggle = document.querySelector('.sidebar-toggle');
@@ -113,25 +95,25 @@
     if (toggle) toggle.addEventListener('click', toggleSidebar);
     if (overlay) overlay.addEventListener('click', toggleSidebar);
 
+    // Sidebar elements — single unified panel
+    var tocNav = document.getElementById('sidebar-toc');
+    var contentArea = document.getElementById('sidebar-content');
+    var sidebarBody = document.querySelector('.sidebar-body');
+
+    // Heading-to-slide mapping
+    var sectionSlideMap = [];
+
     // Load materials from inlined MATERIALS object or fetch as fallback
     var md = (typeof MATERIALS !== 'undefined' && MATERIALS[moduleId]) ? MATERIALS[moduleId] : null;
 
     if (!md && !mod.materialUrl) {
-        if (tocPanel) {
-            tocPanel.innerHTML = '<div class="sidebar-empty">No materials for this session</div>';
-            tocPanel.classList.add('active');
-        }
-        if (contentPanel) {
-            contentPanel.innerHTML = '<div class="sidebar-empty">No materials for this session</div>';
+        if (sidebarBody) {
+            sidebarBody.innerHTML = '<div class="sidebar-empty">No materials for this session</div>';
         }
         return;
     }
 
-    // Heading-to-slide mapping: sections in the TOC become clickable and jump to slides
-    var sectionSlideMap = []; // { headingEl, tocEl, slideIndex }
-
     function renderMaterials(md) {
-        // Strip YAML frontmatter if present
         md = md.replace(/^---[\s\S]*?---\s*/, '');
 
         var html = marked.parse(md, {
@@ -139,14 +121,14 @@
             breaks: false
         });
 
-        if (contentPanel) {
-            contentPanel.innerHTML = html;
+        if (contentArea) {
+            contentArea.innerHTML = html;
         }
 
         buildTOC();
 
-        if (window.mermaid && contentPanel && contentPanel.querySelector('.language-mermaid')) {
-            contentPanel.querySelectorAll('pre code.language-mermaid').forEach(function (block) {
+        if (window.mermaid && contentArea && contentArea.querySelector('.language-mermaid')) {
+            contentArea.querySelectorAll('pre code.language-mermaid').forEach(function (block) {
                 var div = document.createElement('div');
                 div.className = 'mermaid';
                 div.textContent = block.textContent;
@@ -154,16 +136,12 @@
             });
             mermaid.run();
         }
-
-        switchTab('toc');
     }
 
     if (md) {
-        // Use inlined materials (works with file:// protocol)
         renderMaterials(md);
     } else if (mod.materialUrl) {
-        // Fallback to fetch (works with http:// server)
-        if (contentPanel) contentPanel.innerHTML = '<div class="sidebar-loading">Loading materials...</div>';
+        if (contentArea) contentArea.innerHTML = '<div class="sidebar-loading">Loading materials...</div>';
         fetch(mod.materialUrl)
             .then(function (res) {
                 if (!res.ok) throw new Error('Failed to load');
@@ -171,37 +149,30 @@
             })
             .then(renderMaterials)
             .catch(function () {
-                if (contentPanel) contentPanel.innerHTML = '<div class="sidebar-empty">Could not load materials</div>';
-                if (tocPanel) {
-                    tocPanel.innerHTML = '<div class="sidebar-empty">Could not load materials</div>';
-                    tocPanel.classList.add('active');
+                if (sidebarBody) {
+                    sidebarBody.innerHTML = '<div class="sidebar-empty">Could not load materials</div>';
                 }
             });
     }
 
     function buildTOC() {
-        if (!tocPanel || !contentPanel) return;
+        if (!tocNav || !contentArea) return;
 
-        var headings = contentPanel.querySelectorAll('h1, h2, h3');
+        var headings = contentArea.querySelectorAll('h1, h2, h3');
         if (headings.length === 0) {
-            tocPanel.innerHTML = '<div class="sidebar-empty">No chapters found</div>';
-            tocPanel.classList.add('active');
+            tocNav.style.display = 'none';
             return;
         }
 
-        tocPanel.innerHTML = '';
+        tocNav.innerHTML = '';
         sectionSlideMap = [];
         var fragment = document.createDocumentFragment();
-
-        // Calculate approximate slide index per heading based on position ratio
         var totalHeadings = headings.length;
 
         headings.forEach(function (heading, i) {
             var id = 'section-' + i;
             heading.id = id;
 
-            // Approximate which slide this section corresponds to
-            // Distribute sections proportionally across slides
             var approxSlide = Math.round((i / totalHeadings) * totalSlides) + 1;
 
             var link = document.createElement('a');
@@ -219,12 +190,11 @@
                     iframe.contentWindow.postMessage({ type: 'goToSlide', index: slideIdx }, '*');
                 }
 
-                // Also scroll the content view
-                switchTab('content');
+                // Scroll the content into view within the sidebar
                 heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                 // Update active state
-                tocPanel.querySelectorAll('.toc-item').forEach(function (el) { el.classList.remove('active'); });
+                tocNav.querySelectorAll('.toc-item').forEach(function (el) { el.classList.remove('active'); });
                 link.classList.add('active');
             });
 
@@ -232,30 +202,29 @@
             fragment.appendChild(link);
         });
 
-        tocPanel.appendChild(fragment);
+        tocNav.appendChild(fragment);
 
-        // Track scroll position to highlight active TOC item when in content view
-        contentPanel.addEventListener('scroll', debounce(function () {
-            var scrollTop = contentPanel.scrollTop;
+        // Track scroll to highlight active TOC item
+        sidebarBody.addEventListener('scroll', debounce(function () {
+            var scrollTop = sidebarBody.scrollTop;
+            var tocHeight = tocNav.offsetHeight;
             var active = null;
 
             headings.forEach(function (heading) {
-                if (heading.offsetTop - 40 <= scrollTop) {
+                if (heading.offsetTop - tocHeight - 20 <= scrollTop) {
                     active = heading.id;
                 }
             });
 
-            tocPanel.querySelectorAll('.toc-item').forEach(function (el) {
+            tocNav.querySelectorAll('.toc-item').forEach(function (el) {
                 el.classList.toggle('active', el.getAttribute('href') === '#' + active);
             });
         }, 50));
     }
 
-    // When slides change, highlight the corresponding TOC section and scroll content
     function highlightCurrentSection() {
         if (sectionSlideMap.length === 0) return;
 
-        // Find the section whose slide is closest to (but not exceeding) current slide
         var bestMatch = null;
         for (var i = 0; i < sectionSlideMap.length; i++) {
             if (sectionSlideMap[i].slideIndex <= currentSlide) {
@@ -265,17 +234,12 @@
 
         if (!bestMatch) return;
 
-        // Highlight in TOC
-        tocPanel.querySelectorAll('.toc-item').forEach(function (el) { el.classList.remove('active'); });
+        tocNav.querySelectorAll('.toc-item').forEach(function (el) { el.classList.remove('active'); });
         bestMatch.tocEl.classList.add('active');
-
-        // Scroll TOC to keep active item visible
         bestMatch.tocEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-        // Scroll content panel to the matching section
-        if (contentPanel.classList.contains('active')) {
-            bestMatch.headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        // Auto-scroll content to matching section
+        bestMatch.headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function debounce(fn, ms) {
