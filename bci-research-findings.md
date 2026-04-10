@@ -90,18 +90,28 @@ This is a textbook implementation of Filter Bank Common Spatial Pattern (FBCSP) 
 
 ## Other Strong Candidates
 
-### 3. Braindecode
+### 3. Braindecode (1,194 stars - strong alternative top pick)
 **Repository:** [braindecode/braindecode](https://github.com/braindecode/braindecode)
-**Stars:** 800+ | **Language:** Python/PyTorch
+**Stars:** 1,194 | **Open Issues:** 95 | **Language:** Python/PyTorch
 
-**Improvement opportunities:**
-- **Bug #889:** SqueezeAndExcitation module has dimension mismatch in fc2 layer
-- **Bug #885:** Standalone MNE preprocessor classes break 19 public preprocessors
-- **Bug #892:** Pydantic v2 serialization failure in model configs
+Braindecode is the main deep learning toolbox for EEG decoding. It has several high-impact bugs that directly affect classification accuracy:
+
+**Critical accuracy-affecting bugs:**
+- **Bug #816:** Official BCI Competition IV-2a tutorial returns **25% accuracy (chance level)** for 4-class motor imagery. The model fails to learn due to insufficient training duration and misconfigured pipeline. Fixing this = immediate, dramatic accuracy improvement in the project's flagship example.
+- **Bug #984:** SyncNet has **swapped parameter initialization** - `phi_ini` (phase shift) pulls from `beta_init_values` and vice versa, causing incorrect model behavior.
+- **Bug #873:** MultiHeadAttention scaling factor is `emb_size ** (1/2)` when it should be `(emb_size // num_heads) ** (1/2)`, deviating from the standard transformer formulation.
+- **Bug #889:** SqueezeAndExcitation module has dimension mismatch in fc2 layer.
+
+**Pipeline/infrastructure bugs:**
+- **Bug #885:** 19 standalone MNE preprocessor classes pass string names instead of callables, breaking the preprocessing pipeline.
+- **Bug #892:** Pydantic v2 serialization failure in model configs (EEGNetConfig, EEGConformerConfig).
+- **Performance #947:** `push_to_hub` bottleneck with hardcoded chunk size.
+
+**Enhancement opportunities:**
 - **Issue #913:** TODO list for adding new model architectures
-- **Performance #947:** `push_to_hub` bottleneck
+- **Issue #828:** Port winning models from EPFL epilepsy competitions
 
-Best for: demonstrating Claude Code fixing real bugs in production ML code.
+Best for: demonstrating Claude Code fixing real bugs in production ML code with immediate, measurable accuracy impact.
 
 ### 4. MIN2Net
 **Repository:** [IoBT-VISTEC/MIN2Net](https://github.com/IoBT-VISTEC/MIN2Net)
@@ -117,20 +127,26 @@ Best for: demonstrating Claude Code fixing real bugs in production ML code.
 
 ### 5. TorchEEG
 **Repository:** [torcheeg/torcheeg](https://github.com/torcheeg/torcheeg)
-**Stars:** 300+ | **Language:** Python/PyTorch
+**Stars:** 558 | **Open Issues:** 31 | **Language:** Python/PyTorch
 
-Comprehensive EEG toolkit with benchmark implementations. Opportunities in:
-- Improving data augmentation pipeline
-- Motor imagery classification modules
-- Imbalanced learning support
+Comprehensive EEG toolkit with benchmark implementations. Notable bugs:
+- **Bug #114:** EEGNet padding bug - even-sized convolution kernels cause the time dimension to increase by 1 (TensorFlow `padding='SAME'` vs PyTorch mismatch)
+- **Issue #156:** Uses NumPy-based `pywt` instead of PyTorch-native `ptwt` for CWT, missing GPU acceleration
+- Motor imagery classification and imbalanced learning improvements
 
 ### 6. pyRiemann
 **Repository:** [pyRiemann/pyRiemann](https://github.com/pyRiemann/pyRiemann)
-**Stars:** 748 | **Language:** Python
+**Stars:** 748 | **Open Issues:** 8 | **Language:** Python
 
-The leading Riemannian geometry library for BCI. Fewer obvious improvement opportunities since it already outperforms most methods, but potential in:
-- GPU acceleration of covariance matrix operations
-- New Riemannian deep learning hybrid methods
+The leading Riemannian geometry library for BCI (backbone of the best-performing MOABB pipelines):
+- **PR #433:** Add Python Array API support for NumPy/PyTorch backend transparency (enables GPU acceleration)
+- **Issue #338** (`help wanted`): Generalize `make_classification_transfer` beyond 2 classes/2 domains
+- **Issue #396:** Generalize `geodesic` to accept ndarray of alpha values
+- **Issue #429:** Unify convergence criteria across iterative mean computations
+
+### 7. MOABB Performance Issues
+- **Issue #394** (`help wanted`): Add parallel processing for `CrossSubjectEvaluation` - parallelization exists for WithinSession and CrossSession but not CrossSubject, which is the most computationally expensive
+- **15+ open dataset requests** (Issues #892-#916, #943-#944) - each a formulaic Python class following existing patterns
 
 ---
 
@@ -160,9 +176,46 @@ The leading Riemannian geometry library for BCI. Fewer obvious improvement oppor
 
 **For maximum impact:** Use MOABB as the evaluation framework, implement a modern DL pipeline (EEG-Conformer or ATCNet), and benchmark it against all existing pipelines. This produces a scientifically rigorous, immediately publishable result.
 
-**For maximum drama:** Take the FBCSP repo and improve accuracy from 58% to 80%+ using modern techniques. This produces the most visually impressive before/after comparison.
+**For maximum drama:** Fix braindecode's official BCI IV-2a tutorial (#816) from 25% (chance) to 80%+ accuracy. This is the project's flagship example broken at chance level - fixing it is both a bug fix AND a dramatic accuracy demonstration.
 
-**For practical contribution:** Fix braindecode bugs (#889, #885, #892) - these are real issues affecting real users.
+**For quickest wins:** Fix braindecode bugs (#816, #984, #873, #889, #885) - these are real bugs affecting real users with clear, scoped fixes.
+
+**For practical contribution:** Add MOABB CrossSubjectEvaluation parallelization (#394, `help wanted`) or implement dataset loaders for the 15+ requested datasets.
+
+---
+
+## Prioritized Action Tiers
+
+### Tier 1 - Quick wins with measurable impact (hours)
+1. **Fix braindecode #816** - Official tutorial at chance level (25% → 80%+). Most dramatic single fix.
+2. **Fix braindecode #984** - SyncNet swapped parameter initialization
+3. **Fix braindecode #873** - MultiHeadAttention wrong scaling factor
+4. **Fix braindecode #889** - SqueezeAndExcitation dimension mismatch
+5. **Fix braindecode #885** - 19 broken MNE preprocessor classes
+6. **Fix TorchEEG #114** - EEGNet padding bug
+
+### Tier 2 - Medium effort, high value (days)
+7. **MOABB #394** - Add parallelization to CrossSubjectEvaluation (`help wanted`)
+8. **Add DL pipelines for P300/SSVEP in MOABB** - currently zero DL coverage
+9. **Implement EEG data augmentation** in braindecode (time-warping, noise injection, channel dropout)
+10. **pyRiemann #433** - Array API / GPU support
+11. **MOABB dataset loaders** - 15+ templated dataset classes needed
+
+### Tier 3 - Larger projects with research impact (weeks)
+12. Integrate EEG foundation models (CodeBrain, NeuroLM) into braindecode + MOABB benchmarking
+13. Implement domain adaptation for cross-subject transfer learning
+14. Build automated hyperparameter optimization into MOABB DL pipelines
+
+---
+
+## Key Insight: Why Deep Learning Underperforms in BCI
+
+SpeechBrain-MOABB proved the gap is **not fundamental** - they achieved **14.9% improvement over MOABB's DL results** simply through:
+1. Proper hyperparameter search (MOABB used defaults)
+2. Multi-seed evaluation (MOABB used single seeds)
+3. Better training recipes (learning rate scheduling, early stopping)
+
+This means Claude Code doesn't need to invent new architectures - just properly configure and train existing ones.
 
 ---
 
@@ -181,3 +234,7 @@ The leading Riemannian geometry library for BCI. Fewer obvious improvement oppor
 - [SpeechBrain-MOABB (14.9% improvement over MOABB)](https://www.sciencedirect.com/science/article/pii/S001048252401182X)
 - [EEG-Deformer](https://github.com/yi-ding-cs/EEG-Deformer)
 - [CIACNet - 85.15% on BCI IV-2a](https://pmc.ncbi.nlm.nih.gov/articles/PMC11841462/)
+- [SpeechBrain Benchmarks GitHub](https://github.com/speechbrain/benchmarks)
+- [BCI Competition IV](https://www.bbci.de/competition/iv/)
+- [BNCI Horizon 2020 Datasets](https://bnci-horizon-2020.eu/database/data-sets)
+- [PhysioNet EEG MI Dataset](https://www.physionet.org/content/eegmmidb/1.0.0/)
