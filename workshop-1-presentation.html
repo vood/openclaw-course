@@ -1066,10 +1066,19 @@
             slides[currentSlide].classList.add('active');
             document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
             document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'slideChange', current: currentSlide + 1, total: slides.length }, '*');
+            }
         }
 
         function nextSlide() { showSlide(currentSlide + 1); }
         function prevSlide() { showSlide(currentSlide - 1); }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'goToSlide') showSlide(e.data.index);
+            if (e.data && e.data.type === 'next') nextSlide();
+            if (e.data && e.data.type === 'prev') prevSlide();
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
@@ -1086,6 +1095,8 @@
             const diff = touchStartX - e.changedTouches[0].clientX;
             if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
         });
+
+        showSlide(0);
     </script>
 </body>
 </html>

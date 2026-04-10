@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Academy</title>
+    <link rel="stylesheet" href="lms/lms.css">
+</head>
+<body>
+    <div class="index-page">
+        <header class="index-header">
+            <h1>OpenClaw Academy</h1>
+            <p>Learn to build and operate autonomous AI agents — from zero to production</p>
+        </header>
+        <div id="courses"></div>
+    </div>
+
+    <script src="lms/course-data.js"></script>
+    <script>
+        var container = document.getElementById('courses');
+
+        COURSES.forEach(function (course) {
+            var section = document.createElement('div');
+            section.className = 'course-section';
+
+            var typeLabel = course.type === 'course' ? 'Course' : 'Webinar';
+            var badgeClass = course.type === 'course' ? 'card-badge' : 'card-badge webinar';
+            var totalSlides = course.modules.reduce(function (sum, m) { return sum + m.slideCount; }, 0);
+            var hasMaterials = course.modules.some(function (m) { return m.materialUrl; });
+
+            // Single-module entries render as one clickable card
+            if (course.modules.length === 1) {
+                var mod = course.modules[0];
+                var card = document.createElement('a');
+                card.className = 'course-header-card course-header-card--link';
+                card.href = 'lms/course-viewer.html?module=' + mod.id;
+
+                card.innerHTML =
+                    '<div class="card-top">' +
+                        '<span class="card-number">' + typeLabel + '</span>' +
+                    '</div>' +
+                    '<div class="card-title">' + course.title + '</div>' +
+                    '<div class="card-subtitle">' + course.subtitle + '</div>' +
+                    '<div class="card-footer">' +
+                        '<span class="card-meta">' + totalSlides + ' slides' + (hasMaterials ? ' + materials' : '') + '</span>' +
+                        '<span class="card-cta">Open &#8594;</span>' +
+                    '</div>';
+
+                section.appendChild(card);
+            } else {
+                // Multi-module: header card + module grid
+                var header = document.createElement('div');
+                header.className = 'course-header-card';
+                header.innerHTML =
+                    '<div class="card-top">' +
+                        '<span class="card-number">' + typeLabel + '</span>' +
+                        '<span class="' + badgeClass + '">' + course.modules.length + ' sessions</span>' +
+                    '</div>' +
+                    '<div class="card-title">' + course.title + '</div>' +
+                    '<div class="card-subtitle">' + course.subtitle + '</div>' +
+                    '<div class="card-footer">' +
+                        '<span class="card-meta">' + totalSlides + ' slides' + (hasMaterials ? ' + materials' : '') + '</span>' +
+                    '</div>';
+                section.appendChild(header);
+
+                var grid = document.createElement('div');
+                grid.className = 'module-grid';
+
+                course.modules.forEach(function (mod) {
+                    var card = document.createElement('a');
+                    card.className = 'module-card';
+                    card.href = 'lms/course-viewer.html?module=' + mod.id;
+
+                    card.innerHTML =
+                        '<div class="module-number">' + mod.label + '</div>' +
+                        '<div class="module-title">' + mod.title + '</div>' +
+                        '<div class="module-subtitle">' + mod.subtitle + '</div>' +
+                        '<div class="module-footer">' +
+                            '<span class="card-meta">' + mod.slideCount + ' slides' + (mod.materialUrl ? ' + materials' : '') + '</span>' +
+                            '<span class="card-cta">Open &#8594;</span>' +
+                        '</div>';
+
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+            }
+
+            container.appendChild(section);
+        });
+    </script>
+</body>
+</html>

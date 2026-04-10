@@ -22,6 +22,7 @@
 - Start in plain language.
 - Use the full sentence with the five highlighted parts:
   hackable framework,
+  autonomous agents,
   personality,
   Telegram / WhatsApp / Slack,
   direct access to your computer and files,
@@ -30,7 +31,7 @@
   chat tools end with the conversation,
   OpenClaw can keep working after the conversation.
 - Bring in the “Linux of AI agents” line only after that.
-- Say that the next slides explain what each highlighted part really means.
+- Say that the next slides explain what each highlighted part really means, with autonomous agents leading directly into the autonomy chapter.
 
 ### Slide 3: Hackable framework
 - Use the workshop slide logic here.
@@ -39,7 +40,7 @@
 - Good line: `If you want to change it, add to it, or shape it, that is the point.`
 
 ### Slide 4: Agents with their own personality
-- This is where personality becomes concrete.
+- This is where autonomy and personality become concrete together.
 - Explain:
   name,
   tone,
@@ -69,6 +70,8 @@
 
 ### Slide 8: Five levels of autonomy
 - Now the framework makes sense because the audience knows what OpenClaw is.
+- Tie it back explicitly to the sentence:
+  `This is the autonomous-agents part of the definition.`
 - This slide now follows the Knight user-role model:
   operator,
   collaborator,

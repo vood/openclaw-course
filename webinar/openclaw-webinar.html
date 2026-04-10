@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw OpenClaw Webinar: Your Questions Answered</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e8e8ed;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.45);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%; height: 100%;
+            display: none;
+            padding: 70px 100px;
+            position: absolute; top: 0; left: 0;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute; top: 30px; left: 100px; right: 100px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 3.8rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 16px; }
+        h2 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; margin-bottom: 24px; }
+        h3 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 20px 0 12px 0; letter-spacing: -0.01em; }
+
+        .slide-content { margin-top: 100px; flex: 1; }
+
+        p, li { font-size: 1.35rem; line-height: 1.8; color: var(--text-dim); font-weight: 400; }
+        ul { list-style: none; margin: 16px 0; }
+        li { margin: 12px 0; padding-left: 28px; position: relative; }
+        li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .highlight { color: #fff; font-weight: 600; }
+        .bad { color: var(--red); font-weight: 600; }
+        .warn { color: var(--orange); font-weight: 500; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+        .three-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 24px; }
+
+        .column {
+            background: var(--surface); padding: 32px;
+            border-radius: var(--radius); border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .column h3 { margin-top: 0; }
+
+        .quote {
+            font-size: 1.3rem; color: var(--text-dim);
+            border-left: 3px solid var(--accent); padding-left: 24px; margin: 32px 0;
+            font-weight: 400;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.03); padding: 28px; border-radius: var(--radius);
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 1rem;
+            color: var(--text); margin: 20px 0; white-space: pre; overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 1.2rem; }
+        th, td { padding: 20px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            transition: width 0.3s ease; z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed; bottom: 24px; right: 40px;
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.1) 0%, var(--bg) 70%);
+        }
+        .title-slide .subtitle { font-size: 1.6rem; }
+        .title-slide h1 { font-size: 5rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; }
+        .title-slide h1 .grad { background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: var(--text-muted); margin-top: 8px; font-weight: 400; }
+
+        .section-number {
+            font-size: 10rem; font-weight: 900;
+            color: #fff; opacity: 0.03; position: absolute; top: 10px; right: 80px;
+            letter-spacing: -0.05em;
+        }
+
+        .prompt-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius); padding: 20px 24px;
+            margin: 16px 0; font-size: 1.05rem; line-height: 1.6; max-width: 750px;
+            color: var(--text);
+        }
+        .prompt-block::before {
+            content: "Prompt";
+            display: block; font-size: 0.7rem; color: var(--accent);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+        }
+
+        .flow-diagram { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 30px 0; flex-wrap: wrap; }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; text-align: center; min-width: 160px; flex: 1; max-width: 220px;
+            backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .flow-step .step-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .flow-step .step-text { font-size: 0.95rem; color: var(--text-dim); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-muted); display: flex; align-items: center; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+        .stat-label { font-size: 1rem; color: var(--text-muted); margin-top: 8px; }
+
+        .step-sequence { display: flex; gap: 16px; margin: 24px 0; }
+        .step-box {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; text-align: center;
+        }
+        .step-box.active-step {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-color: transparent;
+        }
+        .step-box .step-num { font-size: 2.2rem; font-weight: 800; opacity: 0.15; margin-bottom: 8px; color: #fff; }
+        .step-box.active-step .step-num { opacity: 0.3; }
+        .step-box .step-label { font-size: 1rem; color: var(--text-dim); }
+        .step-box.active-step .step-label { color: #fff; }
+
+        .column-accent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.03));
+            border-color: rgba(99,102,241,0.2);
+        }
+        .column-accent h3 { color: #fff; }
+        .column-accent li { color: var(--text); }
+
+        .column-green {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03));
+            border-color: rgba(34,197,94,0.2);
+        }
+        .column-green h3 { color: var(--green); }
+
+        .column-orange {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.03));
+            border-color: rgba(245,158,11,0.2);
+        }
+        .column-orange h3 { color: var(--orange); }
+
+        .tag {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-red { background: rgba(239,68,68,0.12); color: var(--red); }
+        .tag-accent { background: var(--accent-glow); color: var(--accent); }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        @media (min-width: 1600px) { html { font-size: 18px; } }
+        @media (min-width: 1920px) {
+            html { font-size: 20px; }
+            .slide { padding: 80px 140px; }
+            .slide-title { left: 140px; right: 140px; }
+            .flow-step { min-width: 160px; padding: 24px 28px; }
+            .flow-step .step-icon { font-size: 2.2rem; }
+            .stat-card { padding: 40px; }
+            .stat-number { font-size: 3.2rem; }
+            .column { padding: 40px; }
+            .two-columns { gap: 40px; }
+            .step-sequence { gap: 24px; }
+            .step-box { padding: 32px; }
+            .prompt-block { padding: 28px 32px; max-width: 900px; font-size: 1.15rem; }
+            table { font-size: 1.3rem; }
+            th, td { padding: 24px 32px; }
+        }
+        @media (min-width: 2400px) {
+            html { font-size: 24px; }
+            .slide { padding: 100px 200px; }
+            .slide-title { left: 200px; right: 200px; }
+            h1 { font-size: 4.5rem; }
+            .title-slide h1 { font-size: 6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 1.6rem; }
+            .flow-diagram { gap: 20px; }
+            .flow-step { min-width: 180px; padding: 28px 32px; }
+            .stat-grid { gap: 36px; }
+            .stat-card { padding: 48px; }
+            .stat-number { font-size: 3.6rem; }
+            .column { padding: 48px; }
+            .two-columns { gap: 50px; }
+            .prompt-block { padding: 32px 40px; max-width: 1100px; font-size: 1.25rem; }
+            .quote { font-size: 1.5rem; padding-left: 32px; }
+            .code-block { padding: 36px; font-size: 1.1rem; }
+            table { font-size: 1.4rem; }
+            th, td { padding: 28px 36px; }
+            li { margin: 16px 0; }
+            .progress-bar { height: 3px; }
+        }
+        @media (min-width: 3200px) {
+            html { font-size: 30px; }
+            .slide { padding: 120px 260px; }
+            .slide-title { left: 260px; right: 260px; }
+            .title-slide h1 { font-size: 7rem; }
+            .stat-grid { gap: 48px; }
+            .stat-card { padding: 56px; }
+            .column { padding: 56px; }
+            .progress-bar { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- ==================== TITLE ==================== -->
+        <div class="slide title-slide active">
+            <h1>🦀 <span class="grad">OpenClaw</span></h1>
+            <div class="subtitle">Your Questions Answered</div>
+            <p style="margin-top: 48px; color: var(--text-muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <!-- ==================== AGENDA ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>📋 Today's Agenda (60 min)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box active-step">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">🚀 Getting Started</span><br><span style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">10 min</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">💡 Use Cases</span><br><span style="font-size: 0.8rem;">15 min</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">🔐 Security</span><br><span style="font-size: 0.8rem;">10 min</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span class="highlight">🔧 Technical</span><br><span style="font-size: 0.8rem;">15 min</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">5</div>
+                        <div class="step-label"><span class="highlight">✅ Best Practices</span><br><span style="font-size: 0.8rem;">10 min</span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.2rem; color: var(--text-dim); text-align: center;">29 questions from 80 registrants. Let's answer them all.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 1: GETTING STARTED ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🚀 <span class="grad">Getting Started</span></h1>
+            <div class="subtitle">&ldquo;Where do I begin?&rdquo;</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🚀 What Is OpenClaw? (Simple Version)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 32px; color: #fff;">
+                    An AI employee that lives on your computer.
+                </p>
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 32px;">
+                    You text it on <span class="highlight">Telegram or WhatsApp</span>. It does things for you.
+                </p>
+                <div class="flow-diagram">
+                    <div class="flow-step"><div class="step-icon">📱</div><div class="step-text">You text<br><strong style="color:#fff;">&ldquo;Check my email&rdquo;</strong></div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">🧠</div><div class="step-text">Agent reads<br>your inbox</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step"><div class="step-icon">📋</div><div class="step-text">Summarizes<br>urgent items</div></div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border-color: rgba(34,197,94,0.3);"><div class="step-icon">💬</div><div class="step-text"><strong style="color:var(--green);">Sends you</strong><br>the summary</div></div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.1rem; color: var(--text-muted);">Email, calendar, browser, files, scheduling &mdash; all from your phone.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🚀 Do I Need to Code?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: #fff;">
+                    No. But you need <span style="color: var(--accent);">patience</span> and a <span style="color: var(--accent);">coding assistant</span>.
+                </p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>What you need</h3>
+                        <ul>
+                            <li>A computer (Mac Mini, old laptop, or VPS)</li>
+                            <li>A <span class="highlight">coding agent</span> (Claude Code or Codex) to help you set up</li>
+                            <li>A Telegram or WhatsApp account</li>
+                            <li>A dedicated Gmail for your agent</li>
+                            <li>~2 hours for initial setup</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>What you DON'T need</h3>
+                        <ul>
+                            <li>Programming experience</li>
+                            <li>A CS degree</li>
+                            <li>Linux knowledge</li>
+                            <li>The coding agent <span class="highlight">does the hard parts</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 16px;">The setup is the hardest part. Once it works, it works forever.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🚀 From Theory to Practice</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;">The jump from &ldquo;I know what AI is&rdquo; to &ldquo;AI does my work&rdquo;:</p>
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="highlight">Install</span><br><span style="font-size: 0.85rem;">One command</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">Connect</span><br><span style="font-size: 0.85rem;">Telegram + email</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">First task</span><br><span style="font-size: 0.85rem;">&ldquo;Check my email&rdquo;</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Automate</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Cron jobs, workflows</span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; font-size: 1.2rem; color: var(--accent); font-weight: 600;">Resources: our 4-workshop course takes you from zero to multi-agent in 4 weeks.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 2: USE CASES ==================== -->
+
+        <div class="slide title-slide">
+            <h1>💡 <span class="grad">Use Cases</span></h1>
+            <div class="subtitle">What can it actually do?</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💡 Personal Assistant</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;">
+                    <em>&ldquo;Can it manage my to-do list? Triage my WhatsApp? Reduce email replies?&rdquo;</em>
+                </p>
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>📧 Email</h3>
+                        <ul>
+                            <li>Morning inbox digest</li>
+                            <li>Draft replies to routine emails</li>
+                            <li>Flag urgent messages</li>
+                            <li>Auto-reply to simple ones</li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>📱 Messaging</h3>
+                        <ul>
+                            <li>Triage WhatsApp/Telegram</li>
+                            <li>Summarize group chats</li>
+                            <li>Remind you of unanswered messages</li>
+                            <li>Schedule follow-ups</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>📅 Scheduling</h3>
+                        <ul>
+                            <li>Meeting prep 30 min before calls</li>
+                            <li>Daily task briefings</li>
+                            <li>Weekend logistics for families</li>
+                            <li>Appointment reminders</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💡 Business &amp; Professional</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;">
+                    <em>&ldquo;Sales generation? Lead gen? Finance? Content marketing?&rdquo;</em>
+                </p>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>💰 Sales &amp; Marketing</h3>
+                        <ul>
+                            <li><span class="highlight">Lead gen:</span> scan signups, enrich profiles, send personalized outreach</li>
+                            <li><span class="highlight">Social media:</span> daily trend scan, draft posts, post on schedule</li>
+                            <li><span class="highlight">Content:</span> repurpose blog &rarr; LinkedIn &rarr; X &rarr; email</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>📊 Finance &amp; Admin</h3>
+                        <ul>
+                            <li><span class="highlight">Expense tracking:</span> forward receipts, auto-categorize in Sheets</li>
+                            <li><span class="highlight">Report prep:</span> pull data, draft weekly summaries</li>
+                            <li><span class="highlight">Invoice processing:</span> parse emails, extract amounts, track payments</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 16px; font-size: 1.1rem; color: var(--text-muted);">Claire Vo runs 9 agents: personal assistant, family manager, marketer, sales, helpdesk, developer, podcast producer, course operator, kids' educator.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💡 Research, STEM &amp; Agile</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>🔬 Research &amp; STEM</h3>
+                        <ul>
+                            <li>Literature monitoring &mdash; daily scan of arxiv, PubMed</li>
+                            <li>Data pipeline automation</li>
+                            <li>Lab notebook management</li>
+                            <li>Conference deadline tracking</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>⚡ Agile Development</h3>
+                        <ul>
+                            <li>Standup summaries from Slack/Linear</li>
+                            <li>PR review reminders</li>
+                            <li>Sprint metrics reporting</li>
+                            <li>Bug triage from support inbox</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 16px;">&ldquo;Is this something I could offer as a service?&rdquo; &mdash; Yes. Agent setup and management is becoming a real consulting niche.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>💡 Most Surprising Use Case</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.6rem; font-weight: 600; margin-bottom: 32px; color: #fff;">
+                    The ones we didn't expect:
+                </p>
+                <ul>
+                    <li>🎵 An agent that <span class="highlight">plays music on demand</span> via browser automation</li>
+                    <li>👨‍👩‍👧‍👦 A family coordinator that texts both parents <span class="highlight">weekend logistics</span> every Friday</li>
+                    <li>📈 An agent that monitors <span class="highlight">competitor websites daily</span> and drafts response strategies</li>
+                    <li>🧑‍🏫 A kids' educator that sends a <span class="highlight">word of the day and math problem</span> each morning</li>
+                    <li>💼 An agent that <span class="highlight">books itself API credits</span> (the first AI to buy its own compute)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 3: SECURITY ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔐 <span class="grad">Security &amp; Privacy</span></h1>
+            <div class="subtitle">The most asked question</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 The Security Reality</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">
+                    <em>&ldquo;How do you handle sensitive data? Contracts? Financial statements?&rdquo;</em>
+                </p>
+                <div class="two-columns">
+                    <div class="column column-green">
+                        <h3>✅ What OpenClaw does right</h3>
+                        <ul>
+                            <li><span class="highlight">Runs locally</span> on your machine &mdash; data stays with you</li>
+                            <li><span class="highlight">Exec approvals</span> &mdash; hard gate on terminal commands</li>
+                            <li><span class="highlight">UNTRUSTED labels</span> on external content</li>
+                            <li><span class="highlight">Session isolation</span> between conversations</li>
+                            <li><span class="highlight">1Password</span> integration &mdash; no passwords in files</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">⚠️ What to be careful about</h3>
+                        <ul>
+                            <li>Agent has access to <span class="bad">everything</span> on the machine</li>
+                            <li>System prompts are <span class="bad">guidelines, not firewalls</span></li>
+                            <li>Prompt injection via email/web is <span class="bad">real</span></li>
+                            <li>More tools = more <span class="bad">confusion</span> = more risk</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔐 Corporate Device? Local vs Cloud?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;">
+                    <em>&ldquo;Can I use it on a company-issued computer? Local or cloud?&rdquo;</em>
+                </p>
+                <div class="three-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">❌ Don't</h3>
+                        <ul>
+                            <li>Install on your <span class="bad">primary work laptop</span></li>
+                            <li>Give it access to <span class="bad">corporate credentials</span></li>
+                            <li>Run on <span class="bad">shared servers</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>✅ Do</h3>
+                        <ul>
+                            <li>Use a <span class="highlight">dedicated machine</span> (Mac Mini, old laptop)</li>
+                            <li>Create a <span class="highlight">separate user account</span></li>
+                            <li>Give it its own <span class="highlight">email, not yours</span></li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>☁️ Cloud VPS</h3>
+                        <ul>
+                            <li>Good option: Railway, Hetzner, DigitalOcean</li>
+                            <li>As cheap as <span class="highlight">$5/month</span></li>
+                            <li>Isolated from your machine</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 16px; font-size: 1.1rem; color: var(--accent); font-weight: 600;">Golden rule: treat your agent like a new hire. Own workspace, own email, limited access.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 4: TECHNICAL ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔧 <span class="grad">Technical Deep Dive</span></h1>
+            <div class="subtitle">Tools, models, limits, costs</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔧 Why OpenClaw?</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;"><em>&ldquo;Why not NemoClaw? Other AI tools?&rdquo;</em></p>
+                <table>
+                    <tr><th>Feature</th><th>OpenClaw</th><th>NemoClaw</th><th>Claude Cowork</th></tr>
+                    <tr><td>Always-on messaging</td><td><span class="highlight">✅ 50+ channels</span></td><td>✅ Limited</td><td>❌ Desktop only</td></tr>
+                    <tr><td>Self-hosted</td><td><span class="highlight">✅</span></td><td>✅</td><td>❌ Anthropic cloud</td></tr>
+                    <tr><td>Open source</td><td><span class="highlight">✅</span></td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Multi-agent</td><td><span class="highlight">✅ Built-in</span></td><td>Limited</td><td>❌</td></tr>
+                    <tr><td>Skill marketplace</td><td><span class="highlight">2,800+ skills</span></td><td>Growing</td><td>N/A</td></tr>
+                    <tr><td>Ecosystem size</td><td><span class="highlight">228K GitHub stars</span></td><td>Smaller</td><td>N/A</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔧 Models, Costs &amp; The Anthropic Ban</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;"><em>&ldquo;What will it cost now that Claude banned agents?&rdquo;</em></p>
+                <p style="font-size: 1.1rem; margin-bottom: 16px; color: var(--orange);">🚨 April 4, 2026: Anthropic blocked Claude subscriptions from third-party tools like OpenClaw.</p>
+                <div class="three-columns">
+                    <div class="column column-accent">
+                        <h3>OpenAI (recommended)</h3>
+                        <ul>
+                            <li>ChatGPT Plus: <span class="highlight">$20/mo</span></li>
+                            <li>Explicitly supports OpenClaw</li>
+                            <li>Codex 5.3 / GPT-5.4</li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>Cheap models</h3>
+                        <ul>
+                            <li>Kimi 2.5, Minimax M2.5</li>
+                            <li><span class="highlight">~$10/mo</span> for routine tasks</li>
+                            <li>Good for cron jobs, drafts</li>
+                        </ul>
+                    </div>
+                    <div class="column column-orange">
+                        <h3>Startup credits</h3>
+                        <ul>
+                            <li>Anthropic, OpenAI, Google, AWS</li>
+                            <li>Many teams have <span class="highlight">$1000s unused</span></li>
+                            <li>Ask your org!</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 12px; font-size: 1rem; color: var(--text-muted);">Yes, you can run open-source models through OpenClaw. Yes, you can mix providers.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔧 Limitations &amp; Risks</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 16px;"><em>&ldquo;What are the current limitations? Main risks? Memory limits?&rdquo;</em></p>
+                <div class="two-columns">
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">Limitations</h3>
+                        <ul>
+                            <li><span class="bad">Context window</span> &mdash; forgets in long conversations</li>
+                            <li><span class="bad">Setup complexity</span> &mdash; not plug-and-play (yet)</li>
+                            <li><span class="bad">Prompt injection</span> &mdash; can be tricked by external content</li>
+                            <li><span class="bad">Cost</span> &mdash; heavy use gets expensive</li>
+                            <li><span class="bad">Reliability</span> &mdash; crons break, things go wrong</li>
+                        </ul>
+                    </div>
+                    <div class="column column-green">
+                        <h3>Mitigations</h3>
+                        <ul>
+                            <li><span class="highlight">Session resets</span> &mdash; daily at 4am, refreshes memory</li>
+                            <li><span class="highlight">Memory files</span> &mdash; MEMORY.md persists across sessions</li>
+                            <li><span class="highlight">Multi-agent</span> &mdash; split work, limit blast radius</li>
+                            <li><span class="highlight">Model routing</span> &mdash; cheap for simple, expensive for complex</li>
+                            <li><span class="highlight">/restart</span> &mdash; when in doubt, restart the agent</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔧 Managing High Volume</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.3rem; color: var(--text-dim); margin-bottom: 24px;"><em>&ldquo;How do you manage many tasks at once? Long-term tracking?&rdquo;</em></p>
+                <p style="font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 16px;">Five levels of organizing work:</p>
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="highlight">Single Chat</span><br><span style="font-size: 0.8rem;">One conversation</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">Subagents</span><br><span style="font-size: 0.8rem;">Background tasks</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">Threads</span><br><span style="font-size: 0.8rem;">Platform-level</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color:#fff; font-weight: 700;">Multi-Agent</span><br><span style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Separate brains</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">5</div>
+                        <div class="step-label"><span class="highlight">Dedicated</span><br><span style="font-size: 0.8rem;">OS / hardware</span></div>
+                    </div>
+                </div>
+                <p style="margin-top: 16px; font-size: 1.1rem; color: var(--text-dim);">For long-term tracking: agents write to <span class="highlight">Google Sheets</span>, <span class="highlight">memory files</span>, and <span class="highlight">daily logs</span> that persist across sessions.</p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 5: BEST PRACTICES ==================== -->
+
+        <div class="slide title-slide">
+            <h1>✅ <span class="grad">Best Practices</span></h1>
+            <div class="subtitle">Making it work in real life</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>✅ Integrating AI Into Daily Work</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="stat-grid" style="width: 100%; max-width: 900px;">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🎯</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Start with ONE task</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Email digest or meeting prep</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔄</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Close the loop</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">&ldquo;...and verify it works&rdquo;</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">📈</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Build trust gradually</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Read-only &rarr; draft &rarr; send</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔐</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Least privilege</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Only give access it needs</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">💰</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Right model, right job</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Cheap for simple, smart for complex</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔀</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Don't lock in</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Multi-provider, stay flexible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>✅ The Trust Ladder</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="highlight">Week 1</span><br><span style="font-size: 0.85rem;">Read-only: email summaries, research</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">Week 2</span><br><span style="font-size: 0.85rem;">Drafts: email drafts, content ideas</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">Week 3</span><br><span style="font-size: 0.85rem;">Actions: send emails, post content</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Week 4+</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Autonomous: cron jobs, multi-agent</span></div>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 24px;">Don't give your agent your bank password on day one. Build trust like you would with a new employee.</div>
+            </div>
+        </div>
+
+        <!-- ==================== Q&A ==================== -->
+
+        <div class="slide title-slide">
+            <h1>❓ <span class="grad">Q&amp;A</span></h1>
+            <div class="subtitle">Your questions, live</div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🦞 <span class="grad">Thank You</span></h1>
+            <div class="subtitle">Start building. The world is your lobster.</div>
+            <div style="margin-top: 60px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">Interested in our 4-workshop course? Ask us!</p>
+                <p style="font-size: 1.1rem; color: var(--accent); margin-top: 16px;">Artem &amp; Vasili</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'slideChange', current: currentSlide + 1, total: slides.length }, '*');
+            }
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'goToSlide') showSlide(e.data.index);
+            if (e.data && e.data.type === 'next') nextSlide();
+            if (e.data && e.data.type === 'prev') prevSlide();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

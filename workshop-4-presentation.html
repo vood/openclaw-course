@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Workshop 4: Demo Day &amp; What's Next</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.08);
+            --text: #e8e8ed;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.45);
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            width: 100%; height: 100%;
+            display: none;
+            padding: 70px 100px;
+            position: absolute; top: 0; left: 0;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .slide.active { display: flex; flex-direction: column; }
+
+        .slide-title {
+            position: absolute; top: 30px; left: 100px; right: 100px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 3.8rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 16px; }
+        h2 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; margin-bottom: 24px; }
+        h3 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 20px 0 12px 0; letter-spacing: -0.01em; }
+
+        .slide-content { margin-top: 100px; flex: 1; }
+
+        p, li { font-size: 1.35rem; line-height: 1.8; color: var(--text-dim); font-weight: 400; }
+        ul { list-style: none; margin: 16px 0; }
+        li { margin: 12px 0; padding-left: 28px; position: relative; }
+        li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .highlight { color: #fff; font-weight: 600; }
+        .bad { color: var(--red); font-weight: 600; }
+        .warn { color: var(--orange); font-weight: 500; }
+
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+        .three-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 24px; }
+
+        .column {
+            background: var(--surface); padding: 32px;
+            border-radius: var(--radius); border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .column h3 { margin-top: 0; }
+
+        .quote {
+            font-size: 1.3rem; color: var(--text-dim);
+            border-left: 3px solid var(--accent); padding-left: 24px; margin: 32px 0;
+            font-weight: 400;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.03); padding: 28px; border-radius: var(--radius);
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; font-size: 1rem;
+            color: var(--text); margin: 20px 0; white-space: pre; overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 1.2rem; }
+        th, td { padding: 20px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            transition: width 0.3s ease; z-index: 100;
+        }
+
+        .slide-counter {
+            position: fixed; bottom: 24px; right: 40px;
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 0.8rem; color: var(--text-muted); }
+
+        .title-slide {
+            justify-content: center; align-items: center; text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.1) 0%, var(--bg) 70%);
+        }
+        .title-slide .subtitle { font-size: 1.6rem; }
+        .title-slide h1 { font-size: 5rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; }
+        .title-slide h1 .grad { background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: var(--text-muted); margin-top: 8px; font-weight: 400; }
+
+        .section-number {
+            font-size: 10rem; font-weight: 900;
+            color: #fff; opacity: 0.03; position: absolute; top: 10px; right: 80px;
+            letter-spacing: -0.05em;
+        }
+
+        .prompt-block {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius); padding: 20px 24px;
+            margin: 16px 0; font-size: 1.05rem; line-height: 1.6; max-width: 750px;
+            color: var(--text);
+        }
+        .prompt-block::before {
+            content: "Prompt";
+            display: block; font-size: 0.7rem; color: var(--accent);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+        }
+
+        .flow-diagram { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 30px 0; flex-wrap: wrap; }
+        .flow-step {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; text-align: center; min-width: 160px; flex: 1; max-width: 220px;
+            backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .flow-step .step-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .flow-step .step-text { font-size: 0.95rem; color: var(--text-dim); }
+        .flow-arrow { font-size: 1.5rem; color: var(--text-muted); display: flex; align-items: center; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+        .stat-label { font-size: 1rem; color: var(--text-muted); margin-top: 8px; }
+
+        .step-sequence { display: flex; gap: 16px; margin: 24px 0; }
+        .step-box {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; text-align: center;
+        }
+        .step-box.active-step {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border-color: transparent;
+        }
+        .step-box .step-num { font-size: 2.2rem; font-weight: 800; opacity: 0.15; margin-bottom: 8px; color: #fff; }
+        .step-box.active-step .step-num { opacity: 0.3; }
+        .step-box .step-label { font-size: 1rem; color: var(--text-dim); }
+        .step-box.active-step .step-label { color: #fff; }
+
+        .column-accent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.03));
+            border-color: rgba(99,102,241,0.2);
+        }
+        .column-accent h3 { color: #fff; }
+        .column-accent li { color: var(--text); }
+
+        .column-green {
+            background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03));
+            border-color: rgba(34,197,94,0.2);
+        }
+        .column-green h3 { color: var(--green); }
+
+        .column-orange {
+            background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.03));
+            border-color: rgba(245,158,11,0.2);
+        }
+        .column-orange h3 { color: var(--orange); }
+
+        .tag {
+            display: inline-block; padding: 4px 12px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.03em;
+        }
+        .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+        .tag-red { background: rgba(239,68,68,0.12); color: var(--red); }
+        .tag-accent { background: var(--accent-glow); color: var(--accent); }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        @media (min-width: 1600px) { html { font-size: 18px; } }
+        @media (min-width: 1920px) {
+            html { font-size: 20px; }
+            .slide { padding: 80px 140px; }
+            .slide-title { left: 140px; right: 140px; }
+            .flow-step { min-width: 160px; padding: 24px 28px; }
+            .flow-step .step-icon { font-size: 2.2rem; }
+            .stat-card { padding: 40px; }
+            .stat-number { font-size: 3.2rem; }
+            .column { padding: 40px; }
+            .two-columns { gap: 40px; }
+            .step-sequence { gap: 24px; }
+            .step-box { padding: 32px; }
+            .prompt-block { padding: 28px 32px; max-width: 900px; font-size: 1.15rem; }
+            table { font-size: 1.3rem; }
+            th, td { padding: 24px 32px; }
+        }
+        @media (min-width: 2400px) {
+            html { font-size: 24px; }
+            .slide { padding: 100px 200px; }
+            .slide-title { left: 200px; right: 200px; }
+            h1 { font-size: 4.5rem; }
+            .title-slide h1 { font-size: 6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 1.6rem; }
+            .flow-diagram { gap: 20px; }
+            .flow-step { min-width: 180px; padding: 28px 32px; }
+            .stat-grid { gap: 36px; }
+            .stat-card { padding: 48px; }
+            .stat-number { font-size: 3.6rem; }
+            .column { padding: 48px; }
+            .two-columns { gap: 50px; }
+            .prompt-block { padding: 32px 40px; max-width: 1100px; font-size: 1.25rem; }
+            .quote { font-size: 1.5rem; padding-left: 32px; }
+            .code-block { padding: 36px; font-size: 1.1rem; }
+            table { font-size: 1.4rem; }
+            th, td { padding: 28px 36px; }
+            li { margin: 16px 0; }
+            .progress-bar { height: 3px; }
+        }
+        @media (min-width: 3200px) {
+            html { font-size: 30px; }
+            .slide { padding: 120px 260px; }
+            .slide-title { left: 260px; right: 260px; }
+            .title-slide h1 { font-size: 7rem; }
+            .stat-grid { gap: 48px; }
+            .stat-card { padding: 56px; }
+            .column { padding: 56px; }
+            .progress-bar { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- ==================== TITLE ==================== -->
+        <div class="slide title-slide active">
+            <h1>🦀 <span class="grad">OpenClaw Sprint C1</span></h1>
+            <div class="subtitle">Workshop 4: Demo Day &amp; What's Next</div>
+            <p style="margin-top: 48px; color: var(--text-muted); font-size: 1.1rem;">Artem Vysotsky &amp; Vasili Shynkarenka</p>
+        </div>
+
+        <!-- ==================== WELCOME ==================== -->
+        <div class="slide">
+            <div class="slide-title"><h2>👋 Final Workshop</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.8rem; font-weight: 700; margin-bottom: 40px; color: #fff;">
+                    The ecosystem changed. Let's talk about it.<br>Then: <span style="color: var(--accent);">you show what you built.</span>
+                </p>
+                <div class="step-sequence">
+                    <div class="step-box" style="border-color: rgba(239,68,68,0.3);">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span style="color: var(--red); font-weight: 700;">🚨 The Ban</span><br><span style="font-size: 0.85rem;">What happened</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">🔀 Switch</span><br><span style="font-size: 0.85rem;">Update &amp; OpenAI</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">🔍 Alternatives</span><br><span style="font-size: 0.85rem;">Claude Cowork &amp; more</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">🎤 Demos</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">No time limits</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: THE BAN ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🚨 <span class="grad">The Anthropic Ban</span></h1>
+            <div class="subtitle">What happened on April 4, 2026</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🚨 What Changed</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="two-columns">
+                    <div class="column column-green">
+                        <h3>Before (worked)</h3>
+                        <ul>
+                            <li>Claude Pro ($20/mo) or Max ($200/mo)</li>
+                            <li>Point OpenClaw at Claude via <span class="highlight">OAuth</span></li>
+                            <li>Flat-rate, <span class="highlight">predictable</span> cost</li>
+                            <li>Everything just worked</li>
+                        </ul>
+                    </div>
+                    <div class="column" style="border-color: rgba(239,68,68,0.2);">
+                        <h3 style="color: var(--red);">After April 4 (blocked)</h3>
+                        <ul>
+                            <li>Subscriptions <span class="bad">can't be used</span> with third-party tools</li>
+                            <li>Must use API with <span class="bad">pay-as-you-go</span></li>
+                            <li>Costs up to <span class="bad">50x higher</span></li>
+                            <li>Thousands of agents <span class="bad">stopped working</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="quote" style="margin-top: 16px;">Platform risk is real. When you build on someone else's platform, they can change the rules overnight.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🚨 The Timeline</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <table>
+                    <tr><th>When</th><th>What</th></tr>
+                    <tr><td><span class="highlight">Nov 2025</span></td><td>OpenClaw (Clawdbot) launches, goes viral</td></tr>
+                    <tr><td><span class="highlight">Jan 2026</span></td><td>Anthropic starts fingerprinting &amp; suspending accounts</td></tr>
+                    <tr><td><span class="highlight">Jan 2026</span></td><td>Security audit: 512 vulnerabilities, 8 critical</td></tr>
+                    <tr><td><span class="highlight">Feb 2026</span></td><td>Peter Steinberger (creator) joins OpenAI</td></tr>
+                    <tr><td><span class="bad">Apr 4, 2026</span></td><td>Anthropic officially blocks third-party framework usage</td></tr>
+                </table>
+                <p style="margin-top: 16px; font-size: 1.2rem; color: var(--text-dim);">
+                    <span class="highlight">Why:</span> OpenClaw users consumed 10-50x more tokens than normal chat users. Anthropic was losing money.
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: SWITCHING ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔀 <span class="grad">Update &amp; Switch</span></h1>
+            <div class="subtitle">Keep current, move to OpenAI</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔄 Update OpenClaw First</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span class="highlight">Check</span><br><span style="font-size: 0.85rem;">openclaw --version</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span class="highlight">Back up</span><br><span style="font-size: 0.85rem;">workspace + config</span></div>
+                    </div>
+                    <div class="step-box">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span class="highlight">Update</span><br><span style="font-size: 0.85rem;">openclaw update</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Verify</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Test + security audit</span></div>
+                    </div>
+                </div>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 24px;">Back up my workspace, update OpenClaw, verify all channels and cron jobs work, then run openclaw security audit.</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔀 Why OpenAI</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <ul>
+                    <li>✅ ChatGPT subscription <span class="highlight">explicitly supports</span> third-party tools</li>
+                    <li>✅ OpenAI <span class="highlight">publicly welcomes</span> OpenClaw &mdash; no ban risk</li>
+                    <li>✅ Codex 5.3 and GPT-5.4 are <span class="highlight">strong models</span></li>
+                    <li>✅ OpenClaw creator now <span class="highlight">works at OpenAI</span></li>
+                </ul>
+                <div class="prompt-block" style="max-width: 100%; margin-top: 24px;">Switch my OpenClaw to use OpenAI Codex 5.3 as default. Set up embeddings separately. Review SOUL.md for Claude-specific instructions. Test everything.</div>
+                <p style="margin-top: 12px; font-size: 1rem; color: var(--orange);">⚠️ Codex doesn't include embeddings &mdash; needs separate API key for text-embeddings-3</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔀 The Multi-Provider Strategy</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 24px; color: #fff;">Don't lock into one provider. Use the best model for each job.</p>
+                <table>
+                    <tr><th>Task</th><th>Model</th><th>Why</th></tr>
+                    <tr><td>General daily use</td><td><span class="highlight">Codex 5.3</span> (subscription)</td><td>Covered by ChatGPT plan</td></tr>
+                    <tr><td>Complex analysis</td><td><span class="highlight">Claude Opus</span> (API)</td><td>Pay per token, worth it</td></tr>
+                    <tr><td>Routine cron jobs</td><td><span class="highlight">Kimi 2.5 / Minimax</span></td><td>Cheap, fast, good enough</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: ALTERNATIVES ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🔍 <span class="grad">Alternatives</span></h1>
+            <div class="subtitle">The landscape beyond OpenClaw</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔍 Claude Cowork (by Anthropic)</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <p style="font-size: 1.4rem; margin-bottom: 24px; color: var(--text-dim);">Anthropic's own agent. Desktop-focused, not messaging-focused.</p>
+                <div class="two-columns">
+                    <div class="column column-green">
+                        <h3>What it does</h3>
+                        <ul>
+                            <li>Desktop agent &mdash; files, apps, browser</li>
+                            <li><span class="highlight">Computer use</span> &mdash; clicks, scrolls, navigates</li>
+                            <li><span class="highlight">Dispatch</span> &mdash; assign from iPhone</li>
+                            <li>Included in Claude Pro/Max</li>
+                        </ul>
+                    </div>
+                    <div class="column column-accent">
+                        <h3>OpenClaw vs Cowork</h3>
+                        <ul>
+                            <li>OpenClaw = <span class="highlight">always-on messaging</span></li>
+                            <li>Cowork = <span class="highlight">desktop automation</span></li>
+                            <li>They're <span class="highlight">complementary</span>, not competing</li>
+                            <li>You might want <span class="highlight">both</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🔍 Other Alternatives</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <table>
+                    <tr><th>Alternative</th><th>Best for</th><th>Tradeoff</th></tr>
+                    <tr><td><span class="highlight">NanoClaw</span></td><td>Security-first (Docker isolation)</td><td>Smaller ecosystem</td></tr>
+                    <tr><td><span class="highlight">Nanobot</span></td><td>Lightweight (4K lines Python)</td><td>Fewer features</td></tr>
+                    <tr><td><span class="highlight">KiloClaw</span></td><td>Managed hosting (no infra)</td><td>Monthly cost</td></tr>
+                    <tr><td><span class="highlight">IronClaw</span></td><td>Enterprise (zero-trust)</td><td>Complex setup</td></tr>
+                    <tr><td><span class="highlight">Hosted services</span></td><td>Non-technical users</td><td>Less control</td></tr>
+                </table>
+                <div class="quote" style="margin-top: 16px;">The skills you learned &mdash; agent architecture, security, prompt engineering &mdash; transfer to any platform. OpenClaw is a tool, not a religion.</div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: DEMO DAY ==================== -->
+
+        <div class="slide title-slide">
+            <h1>🎤 <span class="grad">Demo Day</span></h1>
+            <div class="subtitle">Show what you built. No time limits.</div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-title"><h2>🎤 Demo Format</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; height: 70%;">
+                <div class="step-sequence">
+                    <div class="step-box active-step">
+                        <div class="step-num">1</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">What</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">What does it do?</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">2</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Show</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Live demo</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">3</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Surprise</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">What surprised you?</span></div>
+                    </div>
+                    <div class="step-box active-step">
+                        <div class="step-num">4</div>
+                        <div class="step-label"><span style="color: #fff; font-weight: 700;">Next</span><br><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">What would you build next?</span></div>
+                    </div>
+                </div>
+                <ul style="margin-top: 24px;">
+                    <li>📱 <span class="highlight">Live demos only</span> &mdash; no slides, no screenshots</li>
+                    <li>💥 It's <span class="highlight">OK if something breaks</span> &mdash; that's part of the story</li>
+                    <li>⏰ <span class="highlight">No time limits</span> &mdash; take as long as you need</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🎤 <span class="grad">DEMOS</span></h1>
+            <div class="subtitle">Let's go! Who's first?</div>
+        </div>
+
+        <!-- ==================== WRAP UP ==================== -->
+
+        <div class="slide">
+            <div class="slide-title"><h2>🏗️ The Full Journey</h2></div>
+            <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 70%;">
+                <div class="stat-grid" style="width: 100%; max-width: 900px;">
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔧</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Workshop 1</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Built the foundation</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">⚡</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Workshop 2</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Made it useful</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🔐</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Workshop 3</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Made it secure</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🎤</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">Workshop 4</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Showed the world</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🧠</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">What you keep</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">The mindset. The skills.</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="font-size: 2rem;">🚀</div>
+                        <div class="stat-label" style="font-size: 1.1rem; color: var(--text);">What's next</div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">The building never stops</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+            <h1>🦞 <span class="grad">Thank You</span></h1>
+            <div class="subtitle">The course is over. The building never stops.</div>
+            <div style="margin-top: 60px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">WhatsApp group stays open for follow-ups</p>
+                <p style="font-size: 1.1rem; color: var(--accent); margin-top: 16px;">Keep building. Stay curious. Stay flexible.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="nav-hint">&larr; &rarr; or Space to navigate</div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'slideChange', current: currentSlide + 1, total: slides.length }, '*');
+            }
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'goToSlide') showSlide(e.data.index);
+            if (e.data && e.data.type === 'next') nextSlide();
+            if (e.data && e.data.type === 'prev') prevSlide();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

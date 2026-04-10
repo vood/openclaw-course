@@ -308,6 +308,11 @@
             color: var(--ink);
         }
 
+        .part-autonomy {
+            background: rgba(37, 99, 235, 0.12);
+            color: #2563eb;
+        }
+
         .flow-diagram {
             display: flex;
             align-items: stretch;
@@ -752,7 +757,8 @@
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:72%;">
                 <p class="definition-sentence">
                     OpenClaw is a <span class="definition-part part-accent">hackable framework</span>
-                    for building <span class="definition-part part-ink">AI agents with their own personality</span>,
+                    for building <span class="definition-part part-autonomy">autonomous agents</span>
+                    with their own <span class="definition-part part-ink">personality</span>,
                     that talk through <span class="definition-part part-warm">Telegram, WhatsApp, and Slack</span>,
                     have <span class="definition-part part-accent">direct access to your computer and files</span>,
                     and <span class="definition-part part-ink">can modify themselves as they work</span>.
@@ -762,7 +768,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Hackable framework</h2></div>
+            <div class="slide-title"><h2><span class="definition-part part-accent">Hackable framework</span></h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">OpenClaw is not just a product you use. It is a framework people build on.</p>
                 <div class="stat-grid" style="width: 100%; max-width: 900px; align-self: center;">
@@ -785,7 +791,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Agents with their own personality</h2></div>
+            <div class="slide-title"><h2>Agents with their own <span class="definition-part part-ink">personality</span></h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <div class="two-columns">
                     <div class="column column-accent">
@@ -815,7 +821,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Telegram, WhatsApp, and Slack</h2></div>
+            <div class="slide-title"><h2><span class="definition-part part-warm">Telegram, WhatsApp, and Slack</span></h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">OpenClaw lives in the channels where you already talk.</p>
                 <div class="flow-diagram">
@@ -844,7 +850,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Direct access to your computer and files</h2></div>
+            <div class="slide-title"><h2><span class="definition-part part-accent">Direct access to your computer and files</span></h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If you want a real system, the context has to live outside the chat box.</p>
                 <div class="three-columns">
@@ -884,7 +890,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Can modify themselves as they work</h2></div>
+            <div class="slide-title"><h2><span class="definition-part part-ink">Can modify themselves as they work</span></h2></div>
             <div class="slide-content" style="display:flex; flex-direction:column; justify-content:center; height:74%;">
                 <p style="font-size: 1.78rem; color: var(--ink); max-width: 1000px;">If a workflow is missing a piece, OpenClaw can add it.</p>
                 <div class="flow-diagram">
@@ -916,7 +922,7 @@
         </div>
 
         <div class="slide">
-            <div class="slide-title"><h2>Five levels of autonomy</h2></div>
+            <div class="slide-title"><h2><span class="definition-part part-autonomy">Autonomous agents</span> and five levels of autonomy</h2></div>
             <div class="slide-content">
                 <p style="max-width: 980px;">The difference is how much control you keep.</p>
                 <div class="scale-grid">
@@ -1502,10 +1508,19 @@
             slides[currentSlide].classList.add('active');
             document.getElementById('counter').textContent = `${currentSlide + 1} / ${slides.length}`;
             document.getElementById('progress').style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'slideChange', current: currentSlide + 1, total: slides.length }, '*');
+            }
         }
 
         function nextSlide() { showSlide(currentSlide + 1); }
         function prevSlide() { showSlide(currentSlide - 1); }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'goToSlide') showSlide(e.data.index);
+            if (e.data && e.data.type === 'next') nextSlide();
+            if (e.data && e.data.type === 'prev') prevSlide();
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
